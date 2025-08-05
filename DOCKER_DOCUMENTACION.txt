@@ -1,0 +1,553 @@
+================================================================================
+                    DOCUMENTACIÓN DOCKER - CLÍNICAFACIL
+================================================================================
+
+FECHA: $(date)
+VERSIÓN: 1.0
+PROYECTO: ClínicaFacil - Sistema de Gestión de Clínica
+
+================================================================================
+                                ÍNDICE
+================================================================================
+
+1. INTRODUCCIÓN
+2. ARCHIVOS DE DOCKER CREADOS
+3. CONFIGURACIÓN INICIAL
+4. USO RÁPIDO
+5. COMANDOS DOCKER
+6. DESARROLLO LOCAL
+7. PRODUCCIÓN
+8. TROUBLESHOOTING
+9. SEGURIDAD
+10. COMANDOS ÚTILES
+
+================================================================================
+                            1. INTRODUCCIÓN
+================================================================================
+
+Esta documentación explica cómo configurar y usar Docker para la aplicación 
+ClínicaFacil, un sistema de gestión de clínica desarrollado en Django.
+
+Docker permite empaquetar la aplicación con todas sus dependencias en un 
+contenedor, facilitando el despliegue y la distribución.
+
+================================================================================
+                    2. ARCHIVOS DE DOCKER CREADOS
+================================================================================
+
+Los siguientes archivos han sido creados para la configuración de Docker:
+
+Dockerfile              - Configuración de la imagen Docker para desarrollo
+Dockerfile.prod         - Configuración optimizada para producción
+docker-compose.yml      - Configuración para desarrollo con múltiples servicios
+requirements.txt        - Dependencias de Python necesarias
+.dockerignore          - Archivos excluidos del contexto de Docker
+docker-build-push.sh   - Script automatizado para build y push (desarrollo)
+docker-prod.sh         - Script automatizado para build y push (producción)
+DOCKER_README.md       - Documentación en formato Markdown
+DOCKER_DOCUMENTACION.txt - Este archivo de documentación
+
+================================================================================
+                          3. CONFIGURACIÓN INICIAL
+================================================================================
+
+REQUISITOS PREVIOS:
+- Docker instalado en el sistema
+- Cuenta en Docker Hub
+- Acceso a internet para descargar imágenes
+
+PASOS DE CONFIGURACIÓN:
+
+1. INSTALAR DOCKER:
+   - Windows: Descargar Docker Desktop desde docker.com
+   - Linux: sudo apt-get install docker.io
+   - macOS: Descargar Docker Desktop
+
+2. VERIFICAR INSTALACIÓN:
+   docker --version
+   docker-compose --version
+
+3. LOGIN A DOCKER HUB:
+   docker login
+   (Ingresar usuario y contraseña de Docker Hub)
+
+4. VERIFICAR ACCESO:
+   docker info
+
+================================================================================
+                             4. USO RÁPIDO
+================================================================================
+
+CONSTRUIR Y HACER PUSH DE LA IMAGEN:
+
+# Usar el script automatizado para desarrollo
+./docker-build-push.sh
+
+# Usar el script automatizado para producción
+./docker-prod.sh
+
+# Especificar nombre y tag personalizados
+./docker-build-push.sh mi-usuario/clinica-facil v1.0.0
+
+DESARROLLO LOCAL CON DOCKER COMPOSE:
+
+# Construir y ejecutar todos los servicios
+docker-compose up --build
+
+# Ejecutar en background
+docker-compose up -d
+
+# Ver logs en tiempo real
+docker-compose logs -f
+
+# Detener servicios
+docker-compose down
+
+# Reconstruir después de cambios
+docker-compose up --build --force-recreate
+
+================================================================================
+                            5. COMANDOS DOCKER
+================================================================================
+
+COMANDOS MANUALES:
+
+# Construir imagen de desarrollo
+docker build -t clinica-facil:latest .
+
+# Construir imagen de producción
+docker build -f Dockerfile.prod -t clinica-facil:prod .
+
+# Ejecutar contenedor de desarrollo
+docker run -p 8000:8000 clinica-facil:latest
+
+# Ejecutar contenedor de producción
+docker run -p 8000:8000 clinica-facil:prod
+
+# Ejecutar en background
+docker run -d -p 8000:8000 --name clinica-app clinica-facil:latest
+
+# Ver contenedores ejecutándose
+docker ps
+
+# Ver todos los contenedores
+docker ps -a
+
+# Ver logs de un contenedor
+docker logs <container_id>
+
+# Ver logs en tiempo real
+docker logs -f <container_id>
+
+# Detener contenedor
+docker stop <container_id>
+
+# Eliminar contenedor
+docker rm <container_id>
+
+# Ejecutar comando dentro del contenedor
+docker exec -it <container_id> bash
+
+# Copiar archivos del contenedor
+docker cp <container_id>:/app/file.txt ./
+
+# Hacer push a Docker Hub
+docker tag clinica-facil:latest tu-usuario/clinica-facil:latest
+docker push tu-usuario/clinica-facil:latest
+
+================================================================================
+                            6. DESARROLLO LOCAL
+================================================================================
+
+CONFIGURACIÓN PARA DESARROLLO:
+
+El archivo docker-compose.yml incluye:
+- Servicio web (Django) en puerto 8000
+- Servicio de base de datos (PostgreSQL) en puerto 5432
+- Volúmenes para datos persistentes
+- Variables de entorno para desarrollo
+
+VARIABLES DE ENTORNO PARA DESARROLLO:
+DEBUG=True
+DJANGO_SETTINGS_MODULE=core.settings
+
+PASOS PARA DESARROLLO:
+
+1. Iniciar servicios:
+   docker-compose up --build
+
+2. Crear superusuario (en otra terminal):
+   docker-compose exec web python manage.py createsuperuser
+
+3. Aplicar migraciones:
+   docker-compose exec web python manage.py migrate
+
+4. Recolectar archivos estáticos:
+   docker-compose exec web python manage.py collectstatic
+
+5. Acceder a la aplicación:
+   http://localhost:8000
+
+COMANDOS ÚTILES PARA DESARROLLO:
+
+# Ver logs del servicio web
+docker-compose logs web
+
+# Ejecutar comando Django
+docker-compose exec web python manage.py shell
+
+# Crear migraciones
+docker-compose exec web python manage.py makemigrations
+
+# Aplicar migraciones
+docker-compose exec web python manage.py migrate
+
+# Crear superusuario
+docker-compose exec web python manage.py createsuperuser
+
+# Recolectar estáticos
+docker-compose exec web python manage.py collectstatic
+
+# Ejecutar tests
+docker-compose exec web python manage.py test
+
+================================================================================
+                               7. PRODUCCIÓN
+================================================================================
+
+CONFIGURACIÓN PARA PRODUCCIÓN:
+
+La imagen de producción usa:
+- Gunicorn como servidor WSGI
+- Usuario no-root para seguridad
+- Configuración optimizada
+- Variables de entorno para producción
+
+VARIABLES DE ENTORNO PARA PRODUCCIÓN:
+DEBUG=False
+DJANGO_SETTINGS_MODULE=core.settings
+DATABASE_URL=postgresql://user:password@host:port/db
+SECRET_KEY=your-secret-key
+
+PASOS PARA PRODUCCIÓN:
+
+1. Construir imagen de producción:
+   ./docker-prod.sh
+
+2. Configurar variables de entorno:
+   export DJANGO_SETTINGS_MODULE=core.settings
+   export DEBUG=False
+   export SECRET_KEY=your-secret-key
+
+3. Ejecutar con Gunicorn:
+   docker run -p 8000:8000 -e DJANGO_SETTINGS_MODULE=core.settings clinica-facil:prod
+
+4. Para ejecutar en background:
+   docker run -d -p 8000:8000 --name clinica-prod clinica-facil:prod
+
+CONFIGURACIÓN AVANZADA PARA PRODUCCIÓN:
+
+# Con variables de entorno
+docker run -p 8000:8000 \
+  -e DEBUG=False \
+  -e SECRET_KEY=your-secret-key \
+  -e DATABASE_URL=postgresql://user:pass@host:port/db \
+  clinica-facil:prod
+
+# Con volúmenes para archivos estáticos
+docker run -p 8000:8000 \
+  -v /path/to/static:/app/staticfiles \
+  -v /path/to/media:/app/media \
+  clinica-facil:prod
+
+# Con red personalizada
+docker network create clinica-network
+docker run --network clinica-network -p 8000:8000 clinica-facil:prod
+
+================================================================================
+                            8. TROUBLESHOOTING
+================================================================================
+
+PROBLEMAS COMUNES Y SOLUCIONES:
+
+1. ERROR DE PERMISOS:
+   Síntoma: "permission denied" al ejecutar docker
+   Solución: sudo usermod -aG docker $USER
+   Luego reiniciar sesión
+
+2. ERROR DE PUERTO OCUPADO:
+   Síntoma: "port already in use"
+   Solución: Cambiar puerto en docker-compose.yml
+   ports:
+     - "8001:8000"
+
+3. ERROR DE MEMORIA:
+   Síntoma: "out of memory" durante build
+   Solución: Aumentar memoria en Docker Desktop
+   O usar: docker build --memory=2g
+
+4. ERROR DE RED:
+   Síntoma: No se puede conectar a la base de datos
+   Solución: Verificar que PostgreSQL esté ejecutándose
+   docker-compose logs db
+
+5. ERROR DE DEPENDENCIAS:
+   Síntoma: "module not found"
+   Solución: Reconstruir imagen
+   docker-compose build --no-cache
+
+6. ERROR DE LOGIN:
+   Síntoma: "authentication required"
+   Solución: docker login
+
+COMANDOS DE LIMPIEZA:
+
+# Eliminar contenedores no usados
+docker container prune
+
+# Eliminar imágenes no usadas
+docker image prune
+
+# Eliminar volúmenes no usados
+docker volume prune
+
+# Eliminar redes no usadas
+docker network prune
+
+# Eliminar todo (cuidado)
+docker system prune -a
+
+# Ver uso de espacio
+docker system df
+
+================================================================================
+                               9. SEGURIDAD
+================================================================================
+
+MEDIDAS DE SEGURIDAD IMPLEMENTADAS:
+
+1. USUARIO NO-ROOT:
+   - La imagen usa usuario 'appuser' en lugar de root
+   - Reduce riesgos de seguridad
+
+2. ARCHIVOS EXCLUIDOS:
+   - .dockerignore excluye archivos sensibles
+   - No se incluyen archivos de configuración local
+   - No se incluyen bases de datos locales
+
+3. VARIABLES DE ENTORNO:
+   - Las claves secretas se configuran externamente
+   - No se hardcodean en la imagen
+
+4. DEPENDENCIAS ACTUALIZADAS:
+   - Se especifican versiones exactas en requirements.txt
+   - Reduce vulnerabilidades conocidas
+
+RECOMENDACIONES DE SEGURIDAD:
+
+1. Para producción:
+   - Usar secrets de Docker o Kubernetes
+   - Configurar firewall
+   - Usar HTTPS con certificados SSL
+   - Monitorear logs de seguridad
+
+2. Para desarrollo:
+   - No usar credenciales reales
+   - Usar variables de entorno locales
+   - No hacer push de archivos sensibles
+
+3. General:
+   - Mantener Docker actualizado
+   - Escanear imágenes regularmente
+   - Usar imágenes oficiales cuando sea posible
+
+================================================================================
+                            10. COMANDOS ÚTILES
+================================================================================
+
+COMANDOS DE INSPECCIÓN:
+
+# Ver imágenes locales
+docker images
+
+# Ver contenedores ejecutándose
+docker ps
+
+# Ver todos los contenedores
+docker ps -a
+
+# Ver volúmenes
+docker volume ls
+
+# Ver redes
+docker network ls
+
+# Ver información del sistema Docker
+docker system df
+
+COMANDOS DE LOGS:
+
+# Ver logs de un contenedor
+docker logs <container_id>
+
+# Ver logs en tiempo real
+docker logs -f <container_id>
+
+# Ver logs de los últimos N minutos
+docker logs --since 10m <container_id>
+
+# Ver logs de un rango de tiempo
+docker logs --since "2023-01-01T00:00:00" <container_id>
+
+COMANDOS DE EJECUCIÓN:
+
+# Ejecutar comando en contenedor
+docker exec -it <container_id> bash
+
+# Ejecutar comando específico
+docker exec <container_id> python manage.py migrate
+
+# Ejecutar con variables de entorno
+docker run -e DEBUG=True -e SECRET_KEY=test clinica-facil:latest
+
+# Ejecutar con volúmenes
+docker run -v $(pwd):/app clinica-facil:latest
+
+COMANDOS DE RED:
+
+# Ver redes disponibles
+docker network ls
+
+# Crear red personalizada
+docker network create clinica-network
+
+# Conectar contenedor a red
+docker run --network clinica-network clinica-facil:latest
+
+# Ver información de red
+docker network inspect clinica-network
+
+COMANDOS DE VOLÚMENES:
+
+# Crear volumen
+docker volume create clinica-data
+
+# Usar volumen
+docker run -v clinica-data:/app/data clinica-facil:latest
+
+# Ver información de volumen
+docker volume inspect clinica-data
+
+# Eliminar volumen
+docker volume rm clinica-data
+
+COMANDOS DE LIMPIEZA:
+
+# Eliminar contenedor
+docker rm <container_id>
+
+# Eliminar imagen
+docker rmi <image_id>
+
+# Eliminar contenedores detenidos
+docker container prune
+
+# Eliminar imágenes no usadas
+docker image prune
+
+# Eliminar todo
+docker system prune -a
+
+================================================================================
+                                ESTRUCTURA
+================================================================================
+
+ESTRUCTURA DE LA IMAGEN DOCKER:
+
+/app/
+├── manage.py              - Archivo principal de Django
+├── core/                  - Configuración principal
+│   ├── settings.py       - Configuración de Django
+│   ├── urls.py          - URLs principales
+│   └── wsgi.py          - Configuración WSGI
+├── citas/                - Aplicación de citas
+├── doctores/             - Aplicación de doctores
+├── pacientes/            - Aplicación de pacientes
+├── users/                - Aplicación de usuarios
+├── gestion/              - Aplicación de gestión
+├── static/               - Archivos estáticos
+├── media/                - Archivos de media
+├── requirements.txt      - Dependencias Python
+└── Dockerfile           - Configuración Docker
+
+ESTRUCTURA DE DOCKER COMPOSE:
+
+services:
+  web:                    - Servicio Django
+    build: .              - Construir desde Dockerfile
+    ports:                - Mapeo de puertos
+      - "8000:8000"      - Puerto de la aplicación
+    environment:          - Variables de entorno
+    volumes:              - Volúmenes montados
+    depends_on:           - Dependencias
+      - db               - Base de datos
+
+  db:                     - Servicio PostgreSQL
+    image: postgres:15    - Imagen oficial
+    environment:          - Variables de BD
+    volumes:              - Datos persistentes
+    ports:                - Puerto de BD
+      - "5432:5432"      - Solo para desarrollo
+
+volumes:                  - Volúmenes definidos
+  postgres_data:         - Datos de PostgreSQL
+  static_volume:         - Archivos estáticos
+  media_volume:          - Archivos de media
+
+================================================================================
+                                CONCLUSIÓN
+================================================================================
+
+Esta configuración de Docker proporciona:
+
+✅ FACILIDAD DE DESPLIEGUE:
+   - Empaquetado completo de la aplicación
+   - Configuración consistente entre entornos
+   - Scripts automatizados para build y push
+
+✅ SEGURIDAD:
+   - Usuario no-root
+   - Archivos sensibles excluidos
+   - Variables de entorno externas
+
+✅ FLEXIBILIDAD:
+   - Configuración separada para desarrollo y producción
+   - Múltiples opciones de despliegue
+   - Fácil escalabilidad
+
+✅ MANTENIMIENTO:
+   - Documentación completa
+   - Scripts automatizados
+   - Comandos de limpieza
+
+Para comenzar a usar Docker con ClínicaFacil:
+
+1. Instalar Docker
+2. Hacer login a Docker Hub
+3. Ejecutar: ./docker-build-push.sh
+4. O para desarrollo: docker-compose up --build
+
+La aplicación estará disponible en: http://localhost:8000
+
+================================================================================
+                                CONTACTO
+================================================================================
+
+Para soporte técnico o preguntas sobre esta configuración de Docker,
+contactar al equipo de desarrollo de ClínicaFacil.
+
+Documentación generada automáticamente.
+Fecha: $(date)
+Versión: 1.0
+
+================================================================================ 

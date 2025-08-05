@@ -1,0 +1,42 @@
+# Dockerfile optimizado para producción
+FROM python:3.11-slim
+
+# Establecer variables de entorno
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV DJANGO_SETTINGS_MODULE=core.settings
+
+# Establecer directorio de trabajo
+WORKDIR /app
+
+# Instalar dependencias del sistema
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        gcc \
+        postgresql-client \
+        curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copiar requirements.txt
+COPY requirements.txt /app/
+
+# Instalar dependencias de Python
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Crear usuario no root
+RUN adduser --disabled-password --gecos '' appuser
+
+# Copiar el código de la aplicación
+COPY . /app/
+
+# Cambiar permisos
+RUN chown -R appuser:appuser /app
+
+# Cambiar al usuario no root
+USER appuser
+
+# Exponer puerto
+EXPOSE 8000
+
+# Comando para producción con Gunicorn
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120", "core.wsgi:application"] 
