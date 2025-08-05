@@ -1,0 +1,312 @@
+{% extends 'base_form.html' %}
+{% load static %}
+
+{% block title %}Nueva Cita - ClínicaFácil{% endblock %}
+
+{% block form_content %}
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">
+                <i class="fas fa-plus text-primary me-2"></i>
+                Nueva Cita
+            </h1>
+            <p class="text-muted">Agenda tu cita médica</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'mis_citas' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>
+                Volver a Mis Citas
+            </a>
+        </div>
+    </div>
+
+    <!-- Información del Paciente -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-user me-2"></i>
+                Información del Paciente
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Nombre:</strong> {{ paciente.user.get_full_name }}</p>
+                    <p><strong>Email:</strong> {{ paciente.user.email }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Teléfono:</strong> {{ paciente.telefono|default:"No especificado" }}</p>
+                    <p><strong>Fecha de Nacimiento:</strong> {{ paciente.fecha_nacimiento|date:"d/m/Y"|default:"No especificado" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de Cita -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-calendar-plus me-2"></i>
+                Detalles de la Cita
+            </h6>
+        </div>
+        <div class="card-body">
+            <form method="post" id="citaForm">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <!-- Doctor -->
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.doctor.id_for_label }}" class="form-label">
+                            <i class="fas fa-user-md me-1"></i>
+                            Doctor *
+                        </label>
+                        {{ form.doctor }}
+                        {% if form.doctor.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.doctor.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <small class="form-text text-muted">Selecciona el doctor con quien quieres agendar tu cita</small>
+                    </div>
+
+                    <!-- Fecha -->
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.fecha.id_for_label }}" class="form-label">
+                            <i class="fas fa-calendar me-1"></i>
+                            Fecha *
+                        </label>
+                        {{ form.fecha }}
+                        {% if form.fecha.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.fecha.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <small class="form-text text-muted">Selecciona la fecha para tu cita</small>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Hora Inicio -->
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.hora_inicio.id_for_label }}" class="form-label">
+                            <i class="fas fa-clock me-1"></i>
+                            Hora de Inicio *
+                        </label>
+                        {{ form.hora_inicio }}
+                        {% if form.hora_inicio.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.hora_inicio.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <small class="form-text text-muted">Hora de inicio de la cita</small>
+                    </div>
+
+                    <!-- Hora Fin -->
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.hora_fin.id_for_label }}" class="form-label">
+                            <i class="fas fa-clock me-1"></i>
+                            Hora de Fin *
+                        </label>
+                        {{ form.hora_fin }}
+                        {% if form.hora_fin.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.hora_fin.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <small class="form-text text-muted">Hora de fin de la cita</small>
+                    </div>
+                </div>
+
+                <!-- Motivo -->
+                <div class="mb-3">
+                    <label for="{{ form.motivo.id_for_label }}" class="form-label">
+                        <i class="fas fa-sticky-note me-1"></i>
+                        Motivo de la Consulta *
+                    </label>
+                    {{ form.motivo }}
+                    {% if form.motivo.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in form.motivo.errors %}
+                        {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <small class="form-text text-muted">Describe brevemente el motivo de tu consulta</small>
+                </div>
+
+                <!-- Notas -->
+                <div class="mb-3">
+                    <label for="{{ form.notas.id_for_label }}" class="form-label">
+                        <i class="fas fa-edit me-1"></i>
+                        Notas Adicionales
+                    </label>
+                    {{ form.notas }}
+                    {% if form.notas.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in form.notas.errors %}
+                        {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <small class="form-text text-muted">Información adicional que consideres importante</small>
+                </div>
+
+                <!-- Botones -->
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'mis_citas' %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>
+                        Crear Cita
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Información Adicional -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Información Importante
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Las citas se crean con estado "Pendiente"
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            El doctor confirmará tu cita
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Puedes cancelar citas pendientes
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Llega 10 minutos antes de tu cita
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Horarios Disponibles
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Horarios de Atención:</strong></p>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-1">
+                            <i class="fas fa-clock text-primary me-2"></i>
+                            Lunes a Viernes: 8:00 AM - 6:00 PM
+                        </li>
+                        <li class="mb-1">
+                            <i class="fas fa-clock text-primary me-2"></i>
+                            Sábados: 8:00 AM - 12:00 PM
+                        </li>
+                        <li class="mb-1">
+                            <i class="fas fa-clock text-primary me-2"></i>
+                            Domingos: Cerrado
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Inicializar Select2 para el campo doctor
+    $('#id_doctor').select2({
+        placeholder: 'Selecciona un doctor',
+        allowClear: true,
+        language: 'es'
+    });
+
+    // Validación del formulario
+    $('#citaForm').on('submit', function(e) {
+        var fecha = $('#id_fecha').val();
+        var horaInicio = $('#id_hora_inicio').val();
+        var horaFin = $('#id_hora_fin').val();
+        var doctor = $('#id_doctor').val();
+        var motivo = $('#id_motivo').val();
+
+        if (!doctor) {
+            alert('Por favor selecciona un doctor');
+            e.preventDefault();
+            return false;
+        }
+
+        if (!fecha) {
+            alert('Por favor selecciona una fecha');
+            e.preventDefault();
+            return false;
+        }
+
+        if (!horaInicio) {
+            alert('Por favor selecciona una hora de inicio');
+            e.preventDefault();
+            return false;
+        }
+
+        if (!horaFin) {
+            alert('Por favor selecciona una hora de fin');
+            e.preventDefault();
+            return false;
+        }
+
+        if (!motivo.trim()) {
+            alert('Por favor ingresa el motivo de la consulta');
+            e.preventDefault();
+            return false;
+        }
+
+        // Validar que la fecha no sea anterior a hoy
+        var hoy = new Date();
+        var fechaCita = new Date(fecha);
+        if (fechaCita < hoy.setHours(0,0,0,0)) {
+            alert('No puedes agendar citas para fechas pasadas');
+            e.preventDefault();
+            return false;
+        }
+
+        // Validar que la hora de fin sea posterior a la hora de inicio
+        if (horaInicio >= horaFin) {
+            alert('La hora de fin debe ser posterior a la hora de inicio');
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // Establecer fecha mínima como hoy
+    var hoy = new Date().toISOString().split('T')[0];
+    $('#id_fecha').attr('min', hoy);
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,77 @@
+{% extends 'users/panel_base.html' %}
+{% block panel_content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">Perfil del Doctor</h4>
+        </div>
+        <div class="card-body">
+          <dl class="row">
+            <dt class="col-sm-4">Nombre</dt>
+            <dd class="col-sm-8">{{ doctor.user.get_full_name|default:doctor.user.username }}</dd>
+            <dt class="col-sm-4">Identificación</dt>
+            <dd class="col-sm-8">{{ doctor.identificacion }}</dd>
+            <dt class="col-sm-4">Especialidades</dt>
+            <dd class="col-sm-8">{% for esp in doctor.especialidades.all %}<span class="badge bg-info text-dark me-1">{{ esp.nombre }}</span>{% endfor %}</dd>
+            <dt class="col-sm-4">Teléfono</dt>
+            <dd class="col-sm-8">{{ doctor.telefono }}</dd>
+            <dt class="col-sm-4">Correo</dt>
+            <dd class="col-sm-8">{{ doctor.user.email }}</dd>
+            <dt class="col-sm-4">Dirección</dt>
+            <dd class="col-sm-8">{{ doctor.direccion }}</dd>
+            <dt class="col-sm-4">Registro Médico</dt>
+            <dd class="col-sm-8">{{ doctor.registro_medico }}</dd>
+            <dt class="col-sm-4">Universidad</dt>
+            <dd class="col-sm-8">{{ doctor.universidad }}</dd>
+            <dt class="col-sm-4">Años de experiencia</dt>
+            <dd class="col-sm-8">{{ doctor.anios_experiencia }}</dd>
+            <dt class="col-sm-4">Estado</dt>
+            <dd class="col-sm-8">{% if doctor.activo %}<span class="badge bg-success">Activo</span>{% else %}<span class="badge bg-danger">Inactivo</span>{% endif %}</dd>
+          </dl>
+          <hr>
+          <h5 class="mb-3">Horarios de atención</h5>
+          <div class="mb-3">
+            {% if user.role == 'admin' %}
+              <a href="/doctores/{{ doctor.pk }}/agregar-horario/" class="btn btn-sm btn-success mb-2">Agregar Horario</a>
+            {% endif %}
+            <div class="table-responsive">
+              <table class="table table-bordered table-sm align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>Día</th>
+                    <th>Hora inicio</th>
+                    <th>Hora fin</th>
+                    {% if user.role == 'admin' %}<th>Acciones</th>{% endif %}
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for horario in doctor.horarios.all %}
+                  <tr>
+                    <td>{{ horario.get_dia_semana_display }}</td>
+                    <td>{{ horario.hora_inicio }}</td>
+                    <td>{{ horario.hora_fin }}</td>
+                    {% if user.role == 'admin' %}
+                    <td>
+                      <a href="/doctores/{{ doctor.pk }}/eliminar-horario/{{ horario.pk }}/" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                    </td>
+                    {% endif %}
+                  </tr>
+                  {% empty %}
+                  <tr><td colspan="4" class="text-center">Sin horarios registrados.</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between mt-4">
+            <a href="/doctores/gestionar/" class="btn btn-outline-secondary">Volver</a>
+            <a href="/citas/crear/?doctor={{ doctor.pk }}" class="btn btn-primary">Agendar cita</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

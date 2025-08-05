@@ -1,0 +1,61 @@
+{% extends 'users/panel_base.html' %}
+{% block panel_content %}
+<div class="container-fluid min-vh-100 d-flex flex-column justify-content-center align-items-center px-3 px-md-4" style="background: #f5f7fa;">
+  <div class="row w-100 justify-content-center align-items-center flex-grow-1">
+    <div class="col-12 col-md-8 col-lg-6 text-center bg-white rounded-4 shadow-lg p-4 p-md-5 my-4">
+      <div class="mb-4">
+        <i class="fas fa-hospital-user text-primary" style="font-size: 3rem;"></i>
+      </div>
+      <h1 class="fw-bold mb-3 text-gradient" style="font-size: 2.5rem;">¡Bienvenido, {{ user.get_full_name|default:user.username }}!</h1>
+      <p class="lead mb-4 text-muted">Sistema de gestión integral para consultorio médico</p>
+      
+      <div class="row g-3 mb-4">
+        <div class="col-12">
+          <div class="alert alert-info border-0 shadow-sm">
+            <i class="fas fa-user-tag me-2"></i>
+            Tu rol: <strong>{{ user.get_role_display }}</strong>
+          </div>
+        </div>
+      </div>
+      
+      {% if user.role == 'paciente' and not user.perfil_paciente.completado %}
+        <div class="alert alert-warning border-0 shadow-sm">
+          <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle me-3" style="font-size: 1.5rem;"></i>
+            <div class="text-start">
+              <strong>¡Atención!</strong><br>
+              Debes completar tu perfil de paciente para poder usar todas las funcionalidades.
+            </div>
+          </div>
+          <div class="mt-3">
+            <a href="/pacientes/completar-perfil/" class="btn btn-warning btn-lg">
+              <i class="fas fa-user-edit me-2"></i>Completar Perfil
+            </a>
+          </div>
+        </div>
+      {% endif %}
+      
+      <div class="row g-3 mt-4">
+        <div class="col-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+              <i class="fas fa-calendar-check text-success mb-2" style="font-size: 2rem;"></i>
+              <h5 class="card-title">Citas</h5>
+              <p class="card-text small text-muted">Gestiona tus citas médicas</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+              <i class="fas fa-user-md text-primary mb-2" style="font-size: 2rem;"></i>
+              <h5 class="card-title">Doctores</h5>
+              <p class="card-text small text-muted">Consulta información médica</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

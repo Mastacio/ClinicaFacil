@@ -1,0 +1,578 @@
+<!-- Side Menu Container -->
+<div class="side-menu-container">
+    <!-- Mobile Overlay -->
+    <div class="side-menu-overlay d-lg-none" id="sideMenuOverlay"></div>
+    
+    <!-- Floating Mobile Button -->
+    <button class="floating-menu-btn d-lg-none" id="floatingMenuBtn" aria-label="Abrir menú">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+        </svg>
+    </button>
+
+    <!-- Side Menu -->
+    <nav class="side-menu navbar navbar-expand-lg" id="sideMenu">
+        <!-- Header -->
+        <div class="side-menu-header">
+            <a class="side-menu-brand" href="/panel/">
+                <div class="brand-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-hospital" viewBox="0 0 16 16">
+                        <path d="M8 4a.5.5 0 0 1 .5.5v.634l.549-.317a.5.5 0 1 1 .5.866L9 6.7V8.5a.5.5 0 0 1-1 0V6.7l-.549.317a.5.5 0 1 1-.5-.866l.549-.317V4.5A.5.5 0 0 1 8 4zM3.732 5.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707zM2 10a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 10zm9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5zm.754-4.246a.389.389 0 0 0-.527-.02L7.547 9.31a.91.91 0 1 0 1.302 1.258l3.434-4.297a.389.389 0 0 0-.029-.518z"/>
+                        <path fill-rule="evenodd" d="M0 10.5A1.5 1.5 0 0 1 1.5 9h13A1.5 1.5 0 0 1 16 10.5v3a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 13.5v-3zM1.5 10a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-13z"/>
+            </svg>
+                </div>
+                <span class="brand-text">ClínicaFácil</span>
+        </a>
+    </div>
+
+        <!-- Menu Content -->
+        <div class="side-menu-content">
+            <ul class="side-menu-list">
+
+            <!-- Inicio -->
+                <li class="side-menu-item">
+                    <a class="side-menu-link {% if request.resolver_match.url_name == 'welcome' %}active{% endif %}" href="/panel/">
+                        <div class="link-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-house-door" viewBox="0 0 16 16">
+                                <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.707 1.5ZM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5 5 5Z"/>
+                            </svg>
+                        </div>
+                        <span class="link-text">Inicio</span>
+                </a>
+            </li>
+
+            {% if user.role == 'admin' or user.role == 'asistente' %}
+            <!-- Doctores -->
+                <li class="side-menu-item">
+                    <a class="side-menu-link {% if request.resolver_match.url_name == 'gestionar_doctores' %}active{% endif %}" href="/doctores/gestionar/">
+                        <div class="link-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-person-badge" viewBox="0 0 16 16">
+                                <path d="M6.5 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                                <path d="M4.5 0A2.5 2.5 0 0 0 2 2.5V14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2.5A2.5 2.5 0 0 0 11.5 0h-7zM3 2.5A1.5 1.5 0 0 1 4.5 1h7A1.5 1.5 0 0 1 13 2.5V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2.5z"/>
+                            </svg>
+                        </div>
+                        <span class="link-text">Doctores</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% if user.role == 'doctor' or user.role == 'asistente' or user.role == 'admin' %}
+            <!-- Pacientes -->
+                <li class="side-menu-item">
+                    <a class="side-menu-link {% if request.resolver_match.url_name == 'gestionar_pacientes' %}active{% endif %}" href="/pacientes/gestionar/">
+                        <div class="link-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
+                                <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8Zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022ZM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816ZM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0Zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/>
+                            </svg>
+                        </div>
+                        <span class="link-text">Pacientes</span>
+                </a>
+            </li>
+                
+            <!-- Citas -->
+                <li class="side-menu-item">
+                    <a class="side-menu-link {% if request.resolver_match.url_name == 'gestionar_citas' %}active{% endif %}" href="/citas/">
+                        <div class="link-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-calendar-event" viewBox="0 0 16 16">
+                                <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm2.45-.7A1 1 0 0 1 14 6V5h1v1a1 1 0 0 1-.05.3l-.5 1.5a.5.5 0 0 1-.9 0L12.05 6.3z"/>
+                                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                            </svg>
+                        </div>
+                        <span class="link-text">Citas</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% if user.role == 'doctor' or user.role == 'admin' %}
+            <!-- Agenda del Doctor -->
+                <li class="side-menu-item">
+                    <a class="side-menu-link {% if request.resolver_match.url_name == 'agenda_doctor' %}active{% endif %}" href="/citas/agenda/">
+                        <div class="link-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-journal-bookmark" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M6 8V1h1v6.117L8.743 6.07a.5.5 0 0 1 .514 0L11 7.117V1h1v7a.5.5 0 0 1-.757.429L9 7.083 6.757 8.43A.5.5 0 0 1 6 8z"/>
+                                <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2z"/>
+                            </svg>
+                        </div>
+                        <span class="link-text">Mi Agenda</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% if user.role == 'paciente' or user.role == 'admin' %}
+            <!-- Mis Citas -->
+                <li class="side-menu-item">
+                    <a class="side-menu-link {% if request.resolver_match.url_name == 'mis_citas' %}active{% endif %}" href="/citas/mis-citas/">
+                        <div class="link-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-calendar-check" viewBox="0 0 16 16">
+                                <path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                            </svg>
+                        </div>
+                        <span class="link-text">Mis Citas</span>
+                </a>
+            </li>
+            {% endif %}
+
+            </ul>
+
+            <!-- Logout Section -->
+            <div class="side-menu-footer">
+                <form action="/logout/" method="post" class="logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="side-menu-logout">
+                        <div class="link-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
+                                <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+                            </svg>
+                        </div>
+                        <span class="link-text">Cerrar Sesión</span>
+                    </button>
+                </form>
+            </div>
+    </div>
+</nav>
+</div>
+
+<style>
+/* Side Menu Styles */
+.side-menu-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1030;
+}
+
+.side-menu {
+    background: linear-gradient(180deg, #0d6efd 0%, #0b5ed7 50%, #0a58ca 100%);
+    height: 100vh;
+    width: 280px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1030;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(0);
+}
+
+.side-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1025;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.side-menu-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Floating Mobile Button */
+.floating-menu-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    background: #0d6efd;
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 1.25rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
+    transition: all 0.3s ease;
+    z-index: 1040;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.floating-menu-btn:hover {
+    background: #0b5ed7;
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(13, 110, 253, 0.5);
+}
+
+.floating-menu-btn:active {
+    transform: scale(0.95);
+}
+
+/* Header Styles */
+.side-menu-header {
+    padding: 1.5rem 1.25rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.side-menu-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: white;
+    font-weight: 700;
+    font-size: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.side-menu-brand:hover {
+    color: rgba(255, 255, 255, 0.9);
+    transform: translateY(-1px);
+    text-decoration: none;
+}
+
+.brand-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brand-text {
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    color: white;
+}
+
+/* Content Styles */
+.side-menu-content {
+    padding: 1rem 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.side-menu-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex: 1;
+}
+
+.side-menu-item {
+    margin: 0.25rem 0.75rem;
+}
+
+.side-menu-link {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.875rem 1rem;
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid transparent;
+    width: 100%;
+    text-align: left;
+}
+
+.side-menu-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.side-menu-link:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateX(4px);
+    border-color: rgba(255, 255, 255, 0.2);
+    text-decoration: none;
+}
+
+.side-menu-link:hover::before {
+    opacity: 1;
+}
+
+.side-menu-link.active {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.side-menu-link.active::before {
+    opacity: 1;
+}
+
+.link-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    order: -1;
+}
+
+.link-text {
+    font-size: 0.95rem;
+    font-weight: 500;
+    white-space: nowrap;
+    color: inherit;
+    flex: 1;
+    text-align: left;
+}
+
+/* Footer Styles */
+.side-menu-footer {
+    padding: 1rem 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+.logout-form {
+    margin: 0;
+}
+
+.side-menu-logout {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: rgba(220, 53, 69, 0.15);
+    border: 1px solid rgba(220, 53, 69, 0.25);
+    border-radius: 12px;
+    color: #ff6b6b;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.95rem;
+    text-align: left;
+}
+
+.side-menu-logout:hover {
+    background: rgba(220, 53, 69, 0.25);
+    border-color: rgba(220, 53, 69, 0.35);
+    color: #ff6b6b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 991.98px) {
+    .side-menu {
+        transform: translateX(-100%);
+        width: 300px;
+    }
+    
+    .side-menu.show {
+        transform: translateX(0);
+    }
+    
+    .side-menu-overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .floating-menu-btn {
+        display: flex;
+    }
+    
+    /* Ensure main content takes full width on mobile */
+    .main-content {
+        margin-left: 0 !important;
+        width: 100vw !important;
+    }
+}
+
+@media (min-width: 992px) {
+    .floating-menu-btn {
+        display: none;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .side-menu {
+        width: 280px;
+    }
+    
+    .side-menu-header {
+        padding: 1.25rem 1rem 0.75rem;
+    }
+    
+    .side-menu-content {
+        padding: 0.75rem 0;
+    }
+    
+    .side-menu-item {
+        margin: 0.125rem 0.5rem;
+    }
+    
+    .side-menu-link {
+        padding: 0.75rem 0.875rem;
+    }
+    
+    .link-text {
+        font-size: 0.9rem;
+    }
+    
+    .floating-menu-btn {
+        bottom: 15px;
+        right: 15px;
+        width: 50px;
+        height: 50px;
+    }
+}
+
+/* Animation for menu items */
+.side-menu-item {
+    opacity: 0;
+    transform: translateX(-20px);
+    animation: slideInLeft 0.5s ease forwards;
+}
+
+.side-menu-item:nth-child(1) { animation-delay: 0.1s; }
+.side-menu-item:nth-child(2) { animation-delay: 0.2s; }
+.side-menu-item:nth-child(3) { animation-delay: 0.3s; }
+.side-menu-item:nth-child(4) { animation-delay: 0.4s; }
+.side-menu-item:nth-child(5) { animation-delay: 0.5s; }
+.side-menu-item:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes slideInLeft {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Scrollbar Styling */
+.side-menu::-webkit-scrollbar,
+.side-menu-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.side-menu::-webkit-scrollbar-track,
+.side-menu-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.side-menu::-webkit-scrollbar-thumb,
+.side-menu-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.side-menu::-webkit-scrollbar-thumb:hover,
+.side-menu-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Focus states for accessibility */
+.side-menu-link:focus,
+.side-menu-logout:focus,
+.floating-menu-btn:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .side-menu {
+        background: #2c3e50;
+    }
+    
+    .side-menu-link {
+        border: 1px solid transparent;
+    }
+    
+    .side-menu-link:hover,
+    .side-menu-link.active {
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Ensure proper spacing for main content */
+@media (min-width: 992px) {
+    /* Removed body padding-left as it conflicts with main-content margin-left */
+}
+</style>
+
+<script>
+// Mobile menu functionality - Solo con botón flotante
+document.addEventListener('DOMContentLoaded', function() {
+    const sideMenu = document.getElementById('sideMenu');
+    const overlay = document.getElementById('sideMenuOverlay');
+    const floatingBtn = document.getElementById('floatingMenuBtn');
+    
+    // Solo el botón flotante controla el menú
+    if (floatingBtn) {
+        floatingBtn.addEventListener('click', function() {
+            sideMenu.classList.add('show');
+            overlay.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        });
+    }
+    
+    // Close menu when clicking overlay
+    if (overlay) {
+        overlay.addEventListener('click', function() {
+            sideMenu.classList.remove('show');
+            overlay.classList.remove('show');
+            document.body.style.overflow = '';
+        });
+    }
+    
+    // Close menu when clicking outside on mobile
+    document.addEventListener('click', function(e) {
+        if (window.innerWidth <= 991.98) {
+            if (!sideMenu.contains(e.target) && !floatingBtn.contains(e.target)) {
+                sideMenu.classList.remove('show');
+                overlay.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        }
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 991.98) {
+            sideMenu.classList.remove('show');
+            overlay.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+    });
+    
+    // Add smooth transitions for menu items
+    const menuItems = document.querySelectorAll('.side-menu-item');
+    menuItems.forEach((item, index) => {
+        item.style.animationDelay = `${(index + 1) * 0.1}s`;
+    });
+});
+</script>

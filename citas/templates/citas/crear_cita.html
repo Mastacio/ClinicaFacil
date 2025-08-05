@@ -1,0 +1,47 @@
+{% extends 'users/panel_base.html' %}
+{% block panel_content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white text-center">
+          <h2 class="mb-0">Registrar nueva cita</h2>
+        </div>
+        <div class="card-body p-4">
+          <form method="post" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+              {% if not ocultar_doctor or field.name != 'doctor' %}
+                {% if not ocultar_paciente or field.name != 'paciente' %}
+                  <div class="row align-items-center mb-2">
+                    <div class="col-4 text-end">
+                      <label for="id_{{ field.name }}" class="form-label mb-0">{{ field.label }}</label>
+                    </div>
+                    <div class="col-8">
+                      {{ field }}
+                      {% if field.errors %}
+                        <div class="text-danger small">{{ field.errors|striptags }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+            <div class="d-flex justify-content-between mt-3">
+              <a href="/citas/gestionar/" class="btn btn-outline-secondary">Cancelar</a>
+              <button type="submit" class="btn btn-success">Registrar Cita</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  <!-- Select2 CSS y JS desde CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <script src="/static/select2-init.js"></script>
+{% endblock %}

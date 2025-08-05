@@ -1,0 +1,424 @@
+{% extends 'users/panel_base.html' %}
+{% load cal_utils %}
+
+{% block panel_content %}
+<div class="container py-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h2 class="fw-bold mb-0">Calendario de Citas del Doctor</h2>
+            <form method="get" class="d-flex align-items-center gap-2">
+                <label for="doctor" class="form-label mb-0">Doctor:</label>
+               <select name="doctor" id="doctor" class="form-select" onchange="this.form.submit()">
+                {% for doc in doctores %}
+                    <option value="{{ doc.id }}" {% if doc.id == doctor.id %}selected{% endif %}>{{ doc }}</option>
+                {% endfor %}
+                </select>
+
+
+            </form>
+        </div>
+
+        <div class="card-body">
+            <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+            <div id="doctor-calendar"></div>
+            <div id="intervalos-dia" style="display:none; margin-top:2rem;"></div>
+
+            <!-- Modal para crear cita -->
+            <div class="modal fade" id="crearCitaModal" tabindex="-1" aria-labelledby="crearCitaModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg">
+                        <div class="modal-header bg-gradient text-white border-0" style="background: linear-gradient(135deg, #0d6efd, #0b5ed7);">
+                            <h5 class="modal-title fw-bold" id="crearCitaModalLabel">
+                                <i class="fas fa-calendar-plus me-2"></i>Crear Nueva Cita
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body p-4" id="crearCitaModalBody">
+                            <div class="text-center py-5">
+                                <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                                <p class="text-muted mb-0">Cargando formulario de cita...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backdrop personalizado más fuerte -->
+            <div id="customBackdrop" class="position-fixed top-0 start-0 w-100 h-100" 
+                 style="display: none;">
+            </div>
+
+            {{ intervalos_por_dia|json_script:"intervalos-por-dia-data" }}
+            {{ dias_idx|json_script:"dias-data" }}
+            {{ semana_actual|json_script:"semana-actual-data" }}
+            {{ citas_map_json|json_script:"citas-map-data" }}
+            {{ slots_detallados|json_script:"slots-detallados-data" }}
+
+            <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+            
+            <style>
+            /* Asegurar que el modal tenga prioridad sobre el menú */
+            #crearCitaModal {
+                z-index: 10000 !important;
+            }
+            
+            #crearCitaModal .modal-dialog {
+                z-index: 10001 !important;
+            }
+            
+            /* Ocultar el menú cuando el modal está abierto */
+            .modal-open .side-menu-container {
+                display: none !important;
+            }
+            
+            /* Asegurar que el backdrop esté por encima de todo */
+            #customBackdrop {
+                z-index: 9999 !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                background: rgba(0, 0, 0, 0.8) !important;
+                backdrop-filter: blur(5px) !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+                outline: none !important;
+            }
+            
+            /* Prevenir que el menú aparezca sobre el modal */
+            .modal-open .floating-menu-btn {
+                display: none !important;
+            }
+            
+            /* Asegurar que el body no tenga scroll cuando el modal está abierto */
+            .modal-open {
+                overflow: hidden !important;
+            }
+            
+            /* Estilos para los slots */
+            .slot-ocupado {
+                background: linear-gradient(135deg, #dc3545, #c82333) !important;
+                color: white !important;
+                border: none !important;
+                box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3) !important;
+            }
+            
+            .slot-disponible {
+                background: linear-gradient(135deg, #28a745, #20c997) !important;
+                color: white !important;
+                border: none !important;
+                box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3) !important;
+                transition: all 0.3s ease !important;
+            }
+            
+            .slot-disponible:hover {
+                transform: translateY(-2px) !important;
+                box-shadow: 0 4px 8px rgba(40, 167, 69, 0.4) !important;
+            }
+            
+            .slot-info {
+                font-size: 0.85rem !important;
+                font-weight: 500 !important;
+            }
+            
+            .slot-paciente {
+                font-size: 0.75rem !important;
+                opacity: 0.9 !important;
+                font-weight: 600 !important;
+            }
+            </style>
+            <script>
+                const intervalos_por_dia = JSON.parse(document.getElementById('intervalos-por-dia-data').textContent);
+                const parseIntervalo = JSON.parse(intervalos_por_dia, null, 2);
+                const dias = JSON.parse(document.getElementById('dias-data').textContent);
+                const semana_actual = JSON.parse(document.getElementById('semana-actual-data').textContent);
+                const citas_map_json = JSON.parse(document.getElementById('citas-map-data').textContent);
+                const citas_map = JSON.parse(citas_map_json);
+                const slots_detallados_json = JSON.parse(document.getElementById('slots-detallados-data').textContent);
+                const slots_detallados = JSON.parse(slots_detallados_json);
+
+                // Construir los eventos de citas para FullCalendar
+                const citas = [];
+                
+                // Iterar sobre todas las fechas en citas_map
+                for (const fecha in citas_map) {
+                    const dia_dict = citas_map[fecha];
+                    
+                    // Iterar sobre todas las horas de inicio de las citas para esta fecha
+                    for (const hora_inicio in dia_dict) {
+                        if (dia_dict.hasOwnProperty(hora_inicio)) {
+                            const cita_info = dia_dict[hora_inicio];
+                            
+                            // Asegurarse de que los datos existen y son válidos
+                            if (cita_info && cita_info.hora_inicio && cita_info.hora_fin && cita_info.fecha) {
+                                // Construir el evento para FullCalendar
+                                const evento = {
+                                    title: `${cita_info.paciente} (${cita_info.hora_inicio} - ${cita_info.hora_fin})`,
+                                    start: `${cita_info.fecha}T${cita_info.hora_inicio}`,
+                                    end: `${cita_info.fecha}T${cita_info.hora_fin}`,
+                                    color: cita_info.estado === 'pendiente' ? '#ffc107' : 
+                                           (cita_info.estado === 'cancelada' ? '#6c757d' : '#dc3545'),
+                                    extendedProps: {
+                                        paciente: cita_info.paciente,
+                                        estado: cita_info.estado,
+                                        motivo: cita_info.motivo,
+                                        fecha: cita_info.fecha,
+                                        hora_inicio: cita_info.hora_inicio,
+                                        hora_fin: cita_info.hora_fin
+                                    }
+                                };
+                                citas.push(evento);
+                            }
+                        }
+                    }
+                }
+
+                // Variable global para el modal
+                let crearCitaModal = null;
+                let isModalLoading = false;
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Inicializar el modal una sola vez
+                    crearCitaModal = new bootstrap.Modal(document.getElementById('crearCitaModal'), {
+                        backdrop: false, // Desactivar backdrop de Bootstrap
+                        keyboard: false
+                    });
+
+                    const calendarEl = document.getElementById('doctor-calendar');
+                    const calendar = new FullCalendar.Calendar(calendarEl, {
+                        initialView: 'dayGridMonth',
+                        locale: 'es',
+                        height: 650,
+                        events: citas,
+                        dateClick: function (info) {
+                            const fecha = info.dateStr;
+                            const dateObj = new Date(fecha);
+                            
+                            // Obtener información de slots para esta fecha específica
+                            const slotsFecha = slots_detallados[fecha] || {};
+                            const citasFecha = citas_map[fecha] || {};
+
+                           
+                            let html = '';
+
+                            // Obtener todos los intervalos disponibles para esta fecha
+                            const intervalosDisponibles = Object.keys(slotsFecha);
+                            
+                            if (intervalosDisponibles.length > 0) {
+                                html += `<h5 class="mb-3">
+                                    <i class="fas fa-calendar-day me-2"></i>
+                                    Intervalos para ${fecha}
+                                </h5>
+                                <div class='row g-2'>`;
+                                
+                                for (let hora of intervalosDisponibles) {
+                                    const slotInfo = slotsFecha[hora];
+                                    const estaOcupado = citasFecha[hora];
+                                    
+                                    if (estaOcupado) {
+                                        const citaInfo = citasFecha[hora];
+                                        html += `
+                                            <div class='col-6 col-md-4 col-lg-3 mb-2'>
+                                                <div class='slot-ocupado p-2 rounded text-center'>
+                                                    <div class='slot-info'>${citaInfo.hora_inicio} - ${citaInfo.hora_fin}</div>
+                                                    <div class='slot-paciente'>${citaInfo.paciente}</div>
+                                                    <small class='text-light opacity-75'>${citaInfo.estado}</small>
+                                                </div>
+                                            </div>`;
+                                    } else {
+                                        const horaFin = slotInfo ? slotInfo.hora_fin : '--:--';
+                                        html += `
+                                            <div class='col-6 col-md-4 col-lg-3 mb-2'>
+                                                <a href='#' class='slot-disponible p-2 rounded text-center text-decoration-none d-block crear-cita-link' 
+                                                   data-fecha='${fecha}' data-hora='${hora}'>
+                                                    <div class='slot-info'>${hora} - ${horaFin}</div>
+                                                    <div class='slot-paciente'>Disponible</div>
+                                                    <small class='text-light opacity-75'>Click para agendar</small>
+                                                </a>
+                                            </div>`;
+                                    }
+                                }
+                                html += '</div>';
+                            } else {
+                                html = `<div class='alert alert-warning'>
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    No hay horarios disponibles para este día.
+                                </div>`;
+                            }
+
+                            const contenedor = document.getElementById('intervalos-dia');
+                            contenedor.innerHTML = html;
+                            contenedor.style.display = 'block';
+                            window.scrollTo({ top: contenedor.offsetTop - 100, behavior: 'smooth' });
+
+                            // Event listeners para el modal - con prevención de duplicados
+                            document.querySelectorAll('.crear-cita-link').forEach(link => {
+                                // Remover listeners anteriores
+                                link.removeEventListener('click', handleCrearCitaClick);
+                                // Agregar nuevo listener
+                                link.addEventListener('click', handleCrearCitaClick, { once: true });
+                            });
+                        }
+                    });
+
+                    calendar.render();
+                });
+
+                function handleCrearCitaClick(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    if (isModalLoading) {
+                        return;
+                    }
+                    
+                    const fecha = this.dataset.fecha;
+                    const hora = this.dataset.hora;
+                    abrirModalCrearCita(fecha, hora);
+                }
+
+                function abrirModalCrearCita(fecha, hora) {
+                    if (isModalLoading) {
+                        return;
+                    }
+                    
+                    isModalLoading = true;
+                    const modalBody = document.getElementById('crearCitaModalBody');
+                    const customBackdrop = document.getElementById('customBackdrop');
+                    
+                    // Mostrar backdrop personalizado primero
+                    customBackdrop.style.display = 'block';
+                    customBackdrop.style.opacity = '0';
+                    setTimeout(() => {
+                        customBackdrop.style.opacity = '1';
+                    }, 10);
+                    
+                    // Mostrar loading
+                    modalBody.innerHTML = `
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <p class="text-muted mb-0">Cargando formulario de cita...</p>
+                        </div>
+                    `;
+                    
+                    // Mostrar modal
+                    crearCitaModal.show();
+                    
+                    // Cargar formulario después de un delay más largo
+                    setTimeout(() => {
+                        const url = `/citas/crear/modal/?doctor={{ doctor.pk }}&fecha=${fecha}&hora_inicio=${hora}`;
+                        
+                        fetch(url, {
+                            headers: {
+                                'Accept': 'text/html',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                            }
+                            return response.text();
+                        })
+                        .then(html => {
+                            // Verificar que el modal esté abierto
+                            const modal = document.getElementById('crearCitaModal');
+                            if (!modal.classList.contains('show')) {
+                                isModalLoading = false;
+                                return;
+                            }
+                            
+                            // Actualizar contenido
+                            modalBody.innerHTML = html;
+                            
+                            // Reinicializar formularios si es necesario
+                            const forms = modalBody.querySelectorAll('form');
+                            forms.forEach(form => {
+                                if (form.classList.contains('needs-validation')) {
+                                    form.classList.remove('needs-validation');
+                                }
+                            });
+                            
+                            isModalLoading = false;
+                        })
+                        .catch(error => {
+                            // Verificar que el modal esté abierto
+                            const modal = document.getElementById('crearCitaModal');
+                            if (!modal.classList.contains('show')) {
+                                isModalLoading = false;
+                                return;
+                            }
+                            
+                            modalBody.innerHTML = `
+                                <div class="text-center py-5">
+                                    <div class="alert alert-danger">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        <strong>Error al cargar el formulario</strong><br>
+                                        <small class="text-muted">${error.message}</small>
+                                    </div>
+                                    <div class="mt-3">
+                                        <button type="button" class="btn btn-primary" onclick="crearCitaModal.hide()">
+                                            <i class="fas fa-times me-2"></i>Cerrar
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            isModalLoading = false;
+                        });
+                    }, 500); // Aumentado a 500ms
+                }
+
+                // Manejar el cierre del modal
+                document.getElementById('crearCitaModal').addEventListener('hidden.bs.modal', function () {
+                    isModalLoading = false;
+                    const modalBody = document.getElementById('crearCitaModalBody');
+                    const customBackdrop = document.getElementById('customBackdrop');
+                    
+                    // Ocultar backdrop personalizado
+                    customBackdrop.style.opacity = '0';
+                    setTimeout(() => {
+                        customBackdrop.style.display = 'none';
+                    }, 300);
+                    
+                    modalBody.innerHTML = `
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <p class="text-muted mb-0">Cargando formulario de cita...</p>
+                        </div>
+                    `;
+                });
+
+                // Event listener para cerrar modal al hacer click en el backdrop
+                document.getElementById('customBackdrop').addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        crearCitaModal.hide();
+                    }
+                });
+
+                // Manejar la clase modal-open en el body
+                document.getElementById('crearCitaModal').addEventListener('show.bs.modal', function () {
+                    document.body.classList.add('modal-open');
+                });
+
+                document.getElementById('crearCitaModal').addEventListener('hidden.bs.modal', function () {
+                    document.body.classList.remove('modal-open');
+                });
+            </script>
+        </div>
+    </div>
+</div>
+{% endblock %}

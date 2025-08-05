@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ClínicaFácil - Sistema de Gestión Médica{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --info-color: #0dcaf0;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+        }
+        
+        body { 
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .card { 
+            border-radius: 1rem;
+            border: none;
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn {
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.75rem 1.5rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+        }
+        
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s ease;
+            padding: 0.75rem 1rem;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+            transform: translateY(-1px);
+        }
+        
+        .input-group-text {
+            border-radius: 0.5rem 0 0 0.5rem;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        
+        .input-group .form-control {
+            border-radius: 0 0.5rem 0.5rem 0;
+            border-left: none;
+        }
+        
+        .alert {
+            border-radius: 0.5rem;
+            border: none;
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary-color), #0b5ed7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Animaciones */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .auth-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        /* Responsive */
+        @media (max-width: 576px) {
+            .card {
+                margin: 1rem;
+                padding: 1.5rem !important;
+            }
+            
+            body {
+                padding: 1rem;
+            }
+        }
+        
+        /* Floating particles effect */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(108, 117, 125, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+                opacity: 0.3;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating particles -->
+    <div class="particles">
+        <div class="particle" style="left: 10%; animation-delay: 0s; width: 20px; height: 20px;"></div>
+        <div class="particle" style="left: 20%; animation-delay: 1s; width: 15px; height: 15px;"></div>
+        <div class="particle" style="left: 30%; animation-delay: 2s; width: 25px; height: 25px;"></div>
+        <div class="particle" style="left: 40%; animation-delay: 3s; width: 18px; height: 18px;"></div>
+        <div class="particle" style="left: 50%; animation-delay: 4s; width: 22px; height: 22px;"></div>
+        <div class="particle" style="left: 60%; animation-delay: 5s; width: 16px; height: 16px;"></div>
+        <div class="particle" style="left: 70%; animation-delay: 6s; width: 24px; height: 24px;"></div>
+        <div class="particle" style="left: 80%; animation-delay: 7s; width: 19px; height: 19px;"></div>
+        <div class="particle" style="left: 90%; animation-delay: 8s; width: 21px; height: 21px;"></div>
+    </div>
+
+    {% block content %}{% endblock %}
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

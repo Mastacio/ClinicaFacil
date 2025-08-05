@@ -1,0 +1,111 @@
+{% extends 'base_auth.html' %}
+{% load users_extras %}
+
+{% block title %}Registro - ClínicaFácil{% endblock %}
+
+{% block content %}
+<div class="container d-flex align-items-center justify-content-center min-vh-100">
+  <div class="card shadow-lg border-0 p-4 p-md-5 auth-card" style="max-width: 500px; width: 100%;">
+    <div class="text-center mb-4">
+      <div class="mb-3">
+        <i class="fas fa-user-plus text-primary" style="font-size: 3.5rem;"></i>
+      </div>
+      <h2 class="fw-bold text-gradient mb-2">Registro de Paciente</h2>
+      <p class="text-muted mb-0">Crea tu cuenta para solicitar citas</p>
+      <div class="mt-3">
+        <small class="text-muted">
+          <i class="fas fa-info-circle me-1"></i>
+          Únete a nuestro sistema médico
+        </small>
+      </div>
+    </div>
+    
+    <form method="post" novalidate>
+      {% csrf_token %}
+      
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger border-0 shadow-sm mb-4">
+          <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <div>
+              {% for error in form.non_field_errors %}
+                {{ error }}
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      
+      {% for field in form %}
+        <div class="mb-3">
+          <label for="id_{{ field.name }}" class="form-label fw-semibold">
+            <i class="fas fa-{% if field.name == 'username' %}user{% elif field.name == 'email' %}envelope{% elif field.name == 'password1' %}lock{% elif field.name == 'password2' %}key{% elif field.name == 'first_name' %}user-tag{% elif field.name == 'last_name' %}user-tag{% else %}edit{% endif %} me-2 text-primary"></i>
+            {{ field.label }}
+          </label>
+          
+          {% if field.name == 'username' or field.name == 'email' %}
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0">
+                <i class="fas fa-{% if field.name == 'username' %}user{% else %}envelope{% endif %} text-muted"></i>
+              </span>
+              {{ field|add_class:'form-control border-start-0' }}
+            </div>
+          {% elif field.name == 'password1' or field.name == 'password2' %}
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0">
+                <i class="fas fa-{% if field.name == 'password1' %}lock{% else %}key{% endif %} text-muted"></i>
+              </span>
+              {{ field|add_class:'form-control border-start-0' }}
+            </div>
+          {% else %}
+            {{ field|add_class:'form-control' }}
+          {% endif %}
+          
+          {% if field.errors %}
+            <div class="invalid-feedback d-block mt-1">
+              {% for error in field.errors %}
+                <small class="text-danger">
+                  <i class="fas fa-exclamation-triangle me-1"></i>{{ error }}
+                </small>
+              {% endfor %}
+            </div>
+          {% endif %}
+          
+          {% if field.help_text %}
+            <small class="form-text text-muted">
+              <i class="fas fa-info-circle me-1"></i>{{ field.help_text }}
+            </small>
+          {% endif %}
+        </div>
+      {% endfor %}
+      
+      <div class="d-grid gap-3 mb-4">
+        <button type="submit" class="btn btn-success btn-lg">
+          <i class="fas fa-user-plus me-2"></i>Registrarse
+        </button>
+        <a href="/" class="btn btn-outline-secondary">
+          <i class="fas fa-home me-2"></i>Ir al Home
+        </a>
+      </div>
+    </form>
+    
+    <div class="text-center">
+      <hr class="my-4">
+      <p class="mb-0">
+        <i class="fas fa-sign-in-alt me-1"></i>
+        ¿Ya tienes cuenta? 
+        <a href="{% url 'login' %}" class="text-decoration-none fw-semibold">
+          Inicia sesión
+        </a>
+      </p>
+    </div>
+    
+    <div class="text-center mt-4">
+      <small class="text-muted">
+        <i class="fas fa-shield-alt me-1"></i>
+        Tu información está segura con nosotros
+      </small>
+    </div>
+  </div>
+</div>
+{% endblock %}

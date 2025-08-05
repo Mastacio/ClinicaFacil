@@ -1,0 +1,36 @@
+{% extends 'users/panel_base.html' %}
+{% block panel_content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">Agregar Horario a {{ doctor.user.get_full_name|default:doctor.user.username }}</h4>
+        </div>
+        <div class="card-body">
+          <form method="post" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+              <div class="row align-items-center mb-2">
+                <div class="col-4 text-end">
+                  <label for="id_{{ field.name }}" class="form-label mb-0">{{ field.label }}</label>
+                </div>
+                <div class="col-8">
+                  {{ field }}
+                  {% if field.errors %}
+                    <div class="text-danger small">{{ field.errors|striptags }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+            <div class="d-flex justify-content-between mt-3">
+              <a href="/doctores/{{ doctor.pk }}/ver/" class="btn btn-outline-secondary">Cancelar</a>
+              <button type="submit" class="btn btn-success">Agregar Horario</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

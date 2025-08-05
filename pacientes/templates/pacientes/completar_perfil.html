@@ -1,0 +1,25 @@
+{% extends 'users/panel_base.html' %}
+{% block panel_content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <div class="card shadow p-4">
+        <h2 class="mb-4 text-center">Completa tu perfil de paciente</h2>
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% for field in form %}
+            <div class="mb-3">
+              <label for="id_{{ field.name }}" class="form-label">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+                <div class="text-danger small">{{ field.errors|striptags }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-success w-100">Guardar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

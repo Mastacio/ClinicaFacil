@@ -1,0 +1,207 @@
+{% extends 'users/panel_base.html' %}
+{% block panel_content %}
+<div class="container-fluid py-4">
+  <div class="card border-0 shadow-lg">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
+      <div class="d-flex align-items-center">
+        <i class="fas fa-user-md me-3" style="font-size: 1.5rem;"></i>
+        <h2 class="fw-bold mb-0">Gestión de Doctores</h2>
+      </div>
+      {% if user.role == 'admin' %}
+        <a href="/doctores/crear/" class="btn btn-light text-primary fw-bold">
+          <i class="fas fa-plus me-2"></i>Agregar Doctor
+        </a>
+      {% endif %}
+    </div>
+    
+    <div class="card-body p-4">
+      <!-- Filtros -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+          <h5 class="card-title mb-3">
+            <i class="fas fa-filter me-2 text-primary"></i>Filtros de Búsqueda
+          </h5>
+          <form method="get" class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Especialidad</label>
+              <select name="especialidad" class="form-select">
+                <option value="">Todas las especialidades</option>
+                {% for esp in especialidades %}
+                  <option value="{{ esp.id }}" {% if especialidad|add:'' == esp.id|stringformat:'s' %}selected{% endif %}>{{ esp.nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Nombre</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light">
+                  <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text" name="nombre" class="form-control" placeholder="Buscar por nombre" value="{{ nombre }}">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Identificación</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light">
+                  <i class="fas fa-id-card text-muted"></i>
+                </span>
+                <input type="text" name="identificacion" class="form-control" placeholder="Buscar por identificación" value="{{ identificacion }}">
+              </div>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search me-2"></i>Filtrar
+              </button>
+              <a href="/doctores/gestionar/" class="btn btn-outline-secondary">
+                <i class="fas fa-times me-2"></i>Limpiar
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Tabla -->
+      <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th><i class="fas fa-hashtag me-2"></i>ID</th>
+              <th><i class="fas fa-user me-2"></i>Nombre</th>
+              <th><i class="fas fa-id-card me-2"></i>Identificación</th>
+              <th><i class="fas fa-stethoscope me-2"></i>Especialidades</th>
+              <th><i class="fas fa-phone me-2"></i>Teléfono</th>
+              <th><i class="fas fa-envelope me-2"></i>Correo</th>
+              <th><i class="fas fa-cogs me-2"></i>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for doctor in page_obj %}
+            <tr>
+              <td><span class="badge bg-secondary">{{ doctor.id }}</span></td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2">
+                    <i class="fas fa-user-md"></i>
+                  </div>
+                  <div>
+                    <div class="fw-semibold">{{ doctor.user.get_full_name|default:doctor.user.username }}</div>
+                    <small class="text-muted">{{ doctor.user.email }}</small>
+                  </div>
+                </div>
+              </td>
+              <td><code>{{ doctor.identificacion }}</code></td>
+              <td>
+                {% for esp in doctor.especialidades.all %}
+                  <span class="badge bg-info text-dark me-1">{{ esp.nombre }}</span>
+                {% endfor %}
+              </td>
+              <td>
+                <a href="tel:{{ doctor.telefono }}" class="text-decoration-none">
+                  <i class="fas fa-phone me-1"></i>{{ doctor.telefono }}
+                </a>
+              </td>
+              <td>
+                <a href="mailto:{{ doctor.user.email }}" class="text-decoration-none">
+                  <i class="fas fa-envelope me-1"></i>{{ doctor.user.email }}
+                </a>
+              </td>
+              <td>
+                <div class="btn-group" role="group">
+                  <a href="/doctores/{{ doctor.id }}/ver/" class="btn btn-sm btn-outline-info" title="Ver detalles">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                  {% if user.role == 'admin' %}
+                    <a href="/doctores/{{ doctor.id }}/editar/" class="btn btn-sm btn-outline-primary" title="Editar">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    {% if doctor.activo %}
+                      <a href="/doctores/{{ doctor.id }}/activar-desactivar/" class="btn btn-sm btn-outline-danger" title="Desactivar">
+                        <i class="fas fa-user-slash"></i>
+                      </a>
+                    {% else %}
+                      <a href="/doctores/{{ doctor.id }}/activar-desactivar/" class="btn btn-sm btn-outline-success" title="Activar">
+                        <i class="fas fa-user-check"></i>
+                      </a>
+                    {% endif %}
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-5">
+                <div class="text-muted">
+                  <i class="fas fa-search" style="font-size: 3rem;"></i>
+                  <h5 class="mt-3">No se encontraron doctores</h5>
+                  <p>Intenta ajustar los filtros de búsqueda</p>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Paginación -->
+      {% if page_obj.has_other_pages %}
+      <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page=1&especialidad={{ especialidad }}&nombre={{ nombre }}&identificacion={{ identificacion }}">
+                <i class="fas fa-angle-double-left"></i>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}&especialidad={{ especialidad }}&nombre={{ nombre }}&identificacion={{ identificacion }}">
+                <i class="fas fa-angle-left"></i>
+              </a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link"><i class="fas fa-angle-double-left"></i></span>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link"><i class="fas fa-angle-left"></i></span>
+            </li>
+          {% endif %}
+          
+          <li class="page-item active">
+            <span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+          </li>
+          
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}&especialidad={{ especialidad }}&nombre={{ nombre }}&identificacion={{ identificacion }}">
+                <i class="fas fa-angle-right"></i>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&especialidad={{ especialidad }}&nombre={{ nombre }}&identificacion={{ identificacion }}">
+                <i class="fas fa-angle-double-right"></i>
+              </a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link"><i class="fas fa-angle-right"></i></span>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link"><i class="fas fa-angle-double-right"></i></span>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+.avatar-sm {
+  width: 32px;
+  height: 32px;
+  font-size: 0.875rem;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,466 @@
+{% extends 'users/panel_base.html' %}
+{% block panel_content %}
+<div class="container-fluid py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <!-- Header del Perfil -->
+      <div class="card border-0 shadow-lg mb-4">
+        <div class="card-body p-0">
+          <div class="row g-0">
+            <div class="col-md-4 bg-gradient text-white d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #0d6efd, #0b5ed7); min-height: 200px;">
+              <div class="text-center">
+                <div class="avatar-lg bg-white text-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3">
+                  <i class="fas fa-user" style="font-size: 3rem;"></i>
+                </div>
+                <h3 class="fw-bold mb-1">{{ paciente.user.get_full_name|default:paciente.user.username }}</h3>
+                <p class="mb-0 opacity-75">Paciente</p>
+                {% if paciente.user.is_active %}
+                  <span class="badge bg-success mt-2">
+                    <i class="fas fa-check-circle me-1"></i>Activo
+                  </span>
+                {% else %}
+                  <span class="badge bg-danger mt-2">
+                    <i class="fas fa-times-circle me-1"></i>Inactivo
+                  </span>
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-8 p-4">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="icon-box bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3">
+                      <i class="fas fa-id-card"></i>
+                    </div>
+                    <div>
+                      <small class="text-muted d-block">Identificación</small>
+                      <strong>{{ paciente.identificacion }}</strong>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="icon-box bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3">
+                      <i class="fas fa-phone"></i>
+                    </div>
+                    <div>
+                      <small class="text-muted d-block">Teléfono</small>
+                      <strong>{{ paciente.telefono }}</strong>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="icon-box bg-info text-white rounded-circle d-flex align-items-center justify-content-center me-3">
+                      <i class="fas fa-envelope"></i>
+                    </div>
+                    <div>
+                      <small class="text-muted d-block">Correo</small>
+                      <strong>{{ paciente.user.email }}</strong>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="icon-box bg-warning text-white rounded-circle d-flex align-items-center justify-content-center me-3">
+                      <i class="fas fa-birthday-cake"></i>
+                    </div>
+                    <div>
+                      <small class="text-muted d-block">Fecha de Nacimiento</small>
+                      <strong>{{ paciente.fecha_nacimiento }}</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información Detallada -->
+      <div class="row g-4">
+        <!-- Información Personal -->
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-light border-0">
+              <h5 class="mb-0">
+                <i class="fas fa-user-circle me-2 text-primary"></i>
+                Información Personal
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-12">
+                  <div class="info-item">
+                    <label class="form-label fw-semibold text-muted">Nombre Completo</label>
+                    <p class="mb-0 fw-bold">{{ paciente.user.get_full_name|default:paciente.user.username }}</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="info-item">
+                    <label class="form-label fw-semibold text-muted">Sexo</label>
+                    <p class="mb-0">
+                      {% if paciente.sexo %}
+                        <span class="badge bg-secondary">{{ paciente.get_sexo_display }}</span>
+                      {% else %}
+                        <span class="text-muted">No especificado</span>
+                      {% endif %}
+                    </p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="info-item">
+                    <label class="form-label fw-semibold text-muted">Edad</label>
+                    <p class="mb-0">
+                      {% if paciente.fecha_nacimiento %}
+                        {% with paciente.fecha_nacimiento|date:"Y" as birth_year %}
+                          {% with "now"|date:"Y" as current_year %}
+                            <span class="badge bg-info">{{ current_year|add:"-"|add:birth_year }} años</span>
+                          {% endwith %}
+                        {% endwith %}
+                      {% else %}
+                        <span class="text-muted">No especificada</span>
+                      {% endif %}
+                    </p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="info-item">
+                    <label class="form-label fw-semibold text-muted">Tipo de Sangre</label>
+                    <p class="mb-0">
+                      {% if paciente.tipo_sangre %}
+                        <span class="badge bg-danger">{{ paciente.tipo_sangre }}</span>
+                      {% else %}
+                        <span class="text-muted">No especificado</span>
+                      {% endif %}
+                    </p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="info-item">
+                    <label class="form-label fw-semibold text-muted">Estado Civil</label>
+                    <p class="mb-0">
+                      {% if paciente.estado_civil %}
+                        <span class="badge bg-secondary">{{ paciente.estado_civil }}</span>
+                      {% else %}
+                        <span class="text-muted">No especificado</span>
+                      {% endif %}
+                    </p>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="info-item">
+                    <label class="form-label fw-semibold text-muted">Ocupación</label>
+                    <p class="mb-0">
+                      {% if paciente.ocupacion %}
+                        <i class="fas fa-briefcase text-primary me-2"></i>
+                        {{ paciente.ocupacion }}
+                      {% else %}
+                        <span class="text-muted">No especificada</span>
+                      {% endif %}
+                    </p>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="info-item">
+                    <label class="form-label fw-semibold text-muted">Dirección</label>
+                    <p class="mb-0">
+                      {% if paciente.direccion %}
+                        <i class="fas fa-map-marker-alt text-danger me-2"></i>
+                        {{ paciente.direccion }}
+                        {% if paciente.ciudad %}, {{ paciente.ciudad }}{% endif %}
+                        {% if paciente.pais %}, {{ paciente.pais }}{% endif %}
+                      {% else %}
+                        <span class="text-muted">No especificada</span>
+                      {% endif %}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Información de Contacto -->
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-light border-0">
+              <h5 class="mb-0">
+                <i class="fas fa-address-book me-2 text-primary"></i>
+                Información de Contacto
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-12">
+                  <div class="info-item">
+                    <label class="form-label fw-semibold text-muted">Correo Electrónico</label>
+                    <p class="mb-0">
+                      <a href="mailto:{{ paciente.user.email }}" class="text-decoration-none">
+                        <i class="fas fa-envelope text-primary me-2"></i>
+                        {{ paciente.user.email }}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="info-item">
+                    <label class="form-label fw-semibold text-muted">Teléfono</label>
+                    <p class="mb-0">
+                      <a href="tel:{{ paciente.telefono }}" class="text-decoration-none">
+                        <i class="fas fa-phone text-success me-2"></i>
+                        {{ paciente.telefono }}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="info-item">
+                    <label class="form-label fw-semibold text-muted">Contacto de Emergencia</label>
+                    <p class="mb-0">
+                      {% if paciente.contacto_emergencia %}
+                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                        {{ paciente.contacto_emergencia }}
+                        {% if paciente.telefono_emergencia %}
+                          <br><small class="text-muted">
+                            <i class="fas fa-phone me-1"></i>{{ paciente.telefono_emergencia }}
+                          </small>
+                        {% endif %}
+                      {% else %}
+                        <span class="text-muted">No especificado</span>
+                      {% endif %}
+                    </p>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="info-item">
+                    <label class="form-label fw-semibold text-muted">Estado de la Cuenta</label>
+                    <p class="mb-0">
+                      {% if paciente.user.is_active %}
+                        <span class="badge bg-success">
+                          <i class="fas fa-check-circle me-1"></i>Cuenta Activa
+                        </span>
+                      {% else %}
+                        <span class="badge bg-danger">
+                          <i class="fas fa-times-circle me-1"></i>Cuenta Inactiva
+                        </span>
+                      {% endif %}
+                    </p>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="info-item">
+                    <label class="form-label fw-semibold text-muted">Fecha de Registro</label>
+                    <p class="mb-0">
+                      <i class="fas fa-calendar-plus text-info me-2"></i>
+                      {{ paciente.user.date_joined|date:"d/m/Y" }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información Médica -->
+      <div class="row g-4 mt-2">
+        <!-- Seguro Médico -->
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-light border-0">
+              <h5 class="mb-0">
+                <i class="fas fa-shield-alt me-2 text-primary"></i>
+                Seguro Médico
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-12">
+                  <div class="info-item">
+                    <label class="form-label fw-semibold text-muted">Aseguradora</label>
+                    <p class="mb-0">
+                      {% if paciente.seguro_medico %}
+                        <i class="fas fa-building text-primary me-2"></i>
+                        {{ paciente.seguro_medico }}
+                      {% else %}
+                        <span class="text-muted">No especificada</span>
+                      {% endif %}
+                    </p>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="info-item">
+                    <label class="form-label fw-semibold text-muted">Número de Seguro</label>
+                    <p class="mb-0">
+                      {% if paciente.numero_seguro %}
+                        <code>{{ paciente.numero_seguro }}</code>
+                      {% else %}
+                        <span class="text-muted">No especificado</span>
+                      {% endif %}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Historial Médico -->
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-light border-0">
+              <h5 class="mb-0">
+                <i class="fas fa-notes-medical me-2 text-primary"></i>
+                Historial Médico
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-12">
+                  <div class="info-item">
+                    <label class="form-label fw-semibold text-muted">Alergias</label>
+                    <p class="mb-0">
+                      {% if paciente.alergias %}
+                        <span class="badge bg-warning text-dark">{{ paciente.alergias }}</span>
+                      {% else %}
+                        <span class="text-muted">No especificadas</span>
+                      {% endif %}
+                    </p>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="info-item">
+                    <label class="form-label fw-semibold text-muted">Enfermedades Crónicas</label>
+                    <p class="mb-0">
+                      {% if paciente.enfermedades_cronicas %}
+                        <span class="badge bg-danger">{{ paciente.enfermedades_cronicas }}</span>
+                      {% else %}
+                        <span class="text-muted">No especificadas</span>
+                      {% endif %}
+                    </p>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="info-item">
+                    <label class="form-label fw-semibold text-muted">Medicamentos</label>
+                    <p class="mb-0">
+                      {% if paciente.medicamentos %}
+                        <span class="badge bg-info text-dark">{{ paciente.medicamentos }}</span>
+                      {% else %}
+                        <span class="text-muted">No especificados</span>
+                      {% endif %}
+                    </p>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="info-item">
+                    <label class="form-label fw-semibold text-muted">Antecedentes Quirúrgicos</label>
+                    <p class="mb-0">
+                      {% if paciente.antecedentes_quirurgicos %}
+                        <span class="badge bg-secondary">{{ paciente.antecedentes_quirurgicos }}</span>
+                      {% else %}
+                        <span class="text-muted">No especificados</span>
+                      {% endif %}
+                    </p>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="info-item">
+                    <label class="form-label fw-semibold text-muted">Antecedentes Familiares</label>
+                    <p class="mb-0">
+                      {% if paciente.antecedentes_familiares %}
+                        <span class="badge bg-dark">{{ paciente.antecedentes_familiares }}</span>
+                      {% else %}
+                        <span class="text-muted">No especificados</span>
+                      {% endif %}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notas Adicionales -->
+      {% if paciente.notas %}
+      <div class="row g-4 mt-2">
+        <div class="col-12">
+          <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light border-0">
+              <h5 class="mb-0">
+                <i class="fas fa-sticky-note me-2 text-primary"></i>
+                Notas Adicionales
+              </h5>
+            </div>
+            <div class="card-body">
+              <p class="mb-0">{{ paciente.notas }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Acciones -->
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <a href="/pacientes/gestionar/" class="btn btn-outline-secondary w-100">
+                <i class="fas fa-arrow-left me-2"></i>Volver
+              </a>
+            </div>
+            <div class="col-md-3">
+              <a href="/pacientes/{{ paciente.id }}/editar/" class="btn btn-outline-primary w-100">
+                <i class="fas fa-edit me-2"></i>Editar
+              </a>
+            </div>
+            <div class="col-md-3">
+              <a href="/citas/crear/?paciente={{ paciente.pk }}" class="btn btn-success w-100">
+                <i class="fas fa-calendar-plus me-2"></i>Agendar Cita
+              </a>
+            </div>
+            <div class="col-md-3">
+              <a href="/pacientes/{{ paciente.id }}/ver/" class="btn btn-info w-100">
+                <i class="fas fa-print me-2"></i>Imprimir
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.avatar-lg {
+  width: 80px;
+  height: 80px;
+  font-size: 2rem;
+}
+
+.icon-box {
+  width: 40px;
+  height: 40px;
+  font-size: 1rem;
+}
+
+.info-item {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.card-header {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+}
+
+.bg-gradient {
+  background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+}
+</style>
+{% endblock %}

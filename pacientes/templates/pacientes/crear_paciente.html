@@ -1,0 +1,59 @@
+{% extends 'users/panel_base.html' %}
+{% block panel_content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white text-center">
+          <h2 class="mb-0">Registrar nuevo paciente</h2>
+        </div>
+        <div class="card-body p-4">
+          <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <h5 class="mb-2">Datos de usuario</h5>
+                {% for field in user_form %}
+                  {% if field.name != 'username' %}
+                  <div class="row align-items-center mb-2">
+                    <div class="col-4 text-end">
+                      <label for="id_{{ field.name }}" class="form-label mb-0">{{ field.label }}</label>
+                    </div>
+                    <div class="col-8">
+                      {{ field }}
+                      {% if field.errors %}
+                        <div class="text-danger small">{{ field.errors|striptags }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+              <div class="col-12 col-md-6">
+                <h5 class="mb-2">Perfil médico</h5>
+                {% for field in perfil_form %}
+                  <div class="row align-items-center mb-2">
+                    <div class="col-4 text-end">
+                      <label for="id_{{ field.name }}" class="form-label mb-0">{{ field.label }}</label>
+                    </div>
+                    <div class="col-8">
+                      {{ field }}
+                      {% if field.errors %}
+                        <div class="text-danger small">{{ field.errors|striptags }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="d-flex justify-content-between mt-3">
+              <a href="/pacientes/gestionar/" class="btn btn-outline-secondary">Cancelar</a>
+              <button type="submit" class="btn btn-success">Registrar Paciente</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

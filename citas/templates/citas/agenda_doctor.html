@@ -1,0 +1,288 @@
+{% extends 'users/panel_base.html' %}
+
+{% block panel_content %}
+<div class="container-fluid py-4">
+    <!-- Header con estadísticas -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="fw-bold mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        {% if es_admin and doctor_filtro %}
+                            Agenda - Dr. {{ doctor.user.get_full_name }}
+                        {% else %}
+                            Mi Agenda - Dr. {{ doctor.user.get_full_name }}
+                        {% endif %}
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <h4 class="mb-0">{{ total_citas }}</h4>
+                                    <small>Total Citas</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-dark">
+                                <div class="card-body text-center">
+                                    <h4 class="mb-0">{{ citas_pendientes }}</h4>
+                                    <small>Pendientes</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h4 class="mb-0">{{ citas_confirmadas }}</h4>
+                                    <small>Confirmadas</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <h4 class="mb-0">{{ citas_completadas }}</h4>
+                                    <small>Completadas</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-filter me-2"></i>
+                        Filtros
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        {% if es_admin %}
+                        <div class="col-md-3">
+                            <label for="doctor" class="form-label">Doctor</label>
+                            <select class="form-select" id="doctor" name="doctor" onchange="this.form.submit()">
+                                <option value="">Seleccionar doctor...</option>
+                                {% for doc in doctores_disponibles %}
+                                    <option value="{{ doc.id }}" {% if doc.id|stringformat:"s" == doctor_filtro %}selected{% endif %}>
+                                        Dr. {{ doc.user.get_full_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% endif %}
+                        <div class="col-md-3">
+                            <label for="fecha" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="fecha" name="fecha" 
+                                   value="{{ fecha_filtro }}" onchange="this.form.submit()">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="estado" class="form-label">Estado</label>
+                            <select class="form-select" id="estado" name="estado" onchange="this.form.submit()">
+                                <option value="">Todos los estados</option>
+                                {% for value, label in estados_choices %}
+                                    <option value="{{ value }}" {% if value == estado_filtro %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-{% if es_admin %}3{% else %}4{% endif %}">
+                            <label for="paciente" class="form-label">Paciente</label>
+                            <input type="text" class="form-control" id="paciente" name="paciente" 
+                                   value="{{ paciente_filtro|default:'' }}" placeholder="Buscar por nombre...">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search me-2"></i>Buscar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Citas -->
+    <div class="row">
+        <div class="col-12">
+            {% if doctor %}
+                {% if citas %}
+                    <div class="row g-4">
+                        {% for cita in citas %}
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card shadow-sm h-100">
+                                    <div class="card-header d-flex justify-content-between align-items-center
+                                                {% if cita.estado == 'pendiente' %}bg-warning text-dark
+                                                {% elif cita.estado == 'confirmada' %}bg-success text-white
+                                                {% elif cita.estado == 'completada' %}bg-info text-white
+                                                {% elif cita.estado == 'cancelada' %}bg-secondary text-white{% endif %}">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-calendar-check me-2"></i>
+                                            {{ cita.get_estado_display }}
+                                        </h6>
+                                        <span class="badge bg-light text-dark">{{ cita.fecha|date:"d/m/Y" }}</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-2 mb-3">
+                                            <div class="col-12">
+                                                <h6 class="fw-bold mb-1">
+                                                    <i class="fas fa-user me-2"></i>
+                                                    {{ cita.paciente.user.get_full_name }}
+                                                </h6>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-envelope me-1"></i>
+                                                    {{ cita.paciente.user.email }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row g-2 mb-3">
+                                            <div class="col-6">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-clock text-primary me-2"></i>
+                                                    <div>
+                                                        <small class="text-muted d-block">Inicio</small>
+                                                        <strong>{{ cita.hora_inicio|time:"H:i" }}</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-clock text-danger me-2"></i>
+                                                    <div>
+                                                        <small class="text-muted d-block">Fin</small>
+                                                        <strong>{{ cita.hora_fin|time:"H:i" }}</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        {% if cita.motivo %}
+                                            <div class="mb-3">
+                                                <small class="text-muted d-block">Motivo</small>
+                                                <p class="mb-0 small">{{ cita.motivo }}</p>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        {% if cita.notas %}
+                                            <div class="mb-3">
+                                                <small class="text-muted d-block">Notas</small>
+                                                <p class="mb-0 small">{{ cita.notas }}</p>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="card-footer bg-light">
+                                        <div class="row g-2">
+                                            {% if cita.estado == 'pendiente' %}
+                                                <div class="col-4">
+                                                    <a href="{% url 'confirmar_cita_agenda' cita.pk %}?{{ request.GET.urlencode }}" 
+                                                       class="btn btn-success btn-sm w-100"
+                                                       onclick="return confirm('¿Estás seguro de que quieres confirmar esta cita?')">
+                                                        <i class="fas fa-check me-1"></i>Confirmar
+                                                    </a>
+                                                </div>
+                                                <div class="col-4">
+                                                    <a href="{% url 'cancelar_cita_agenda' cita.pk %}?{{ request.GET.urlencode }}" 
+                                                       class="btn btn-outline-danger btn-sm w-100"
+                                                       onclick="return confirm('¿Estás seguro de que quieres cancelar esta cita?')">
+                                                        <i class="fas fa-times me-1"></i>Cancelar
+                                                    </a>
+                                                </div>
+                                                <div class="col-4">
+                                                    <a href="{% url 'gestion:gestionar_cita' cita.pk %}?{{ request.GET.urlencode }}" 
+                                                       class="btn btn-outline-primary btn-sm w-100">
+                                                        <i class="fas fa-cogs me-1"></i>Gestionar
+                                                    </a>
+                                                </div>
+                                            {% elif cita.estado == 'confirmada' %}
+                                                <div class="col-6">
+                                                    <a href="{% url 'gestion:gestionar_cita' cita.pk %}?{{ request.GET.urlencode }}" 
+                                                       class="btn btn-outline-primary btn-sm w-100">
+                                                        <i class="fas fa-cogs me-1"></i>Gestionar
+                                                    </a>
+                                                </div>
+                                                <div class="col-6">
+                                                    <a href="{% url 'cancelar_cita_agenda' cita.pk %}?{{ request.GET.urlencode }}" 
+                                                       class="btn btn-outline-danger btn-sm w-100"
+                                                       onclick="return confirm('¿Estás seguro de que quieres cancelar esta cita?')">
+                                                        <i class="fas fa-times me-1"></i>Cancelar
+                                                    </a>
+                                                </div>
+                                            {% elif cita.estado == 'completada' %}
+                                                <div class="col-12">
+                                                    <a href="{% url 'gestion:gestionar_cita' cita.pk %}?{{ request.GET.urlencode }}" 
+                                                       class="btn btn-outline-secondary btn-sm w-100">
+                                                        <i class="fas fa-eye me-1"></i>Ver Detalle
+                                                    </a>
+                                                </div>
+                                            {% else %}
+                                                <div class="col-12">
+                                                    <button class="btn btn-outline-secondary btn-sm w-100" disabled>
+                                                        <i class="fas fa-eye me-1"></i>Ver Detalles
+                                                    </button>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="card shadow-sm">
+                        <div class="card-body text-center py-5">
+                            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No hay citas para mostrar</h5>
+                            <p class="text-muted">No se encontraron citas con los filtros aplicados.</p>
+                            <a href="{% url 'agenda_doctor' %}" class="btn btn-primary">
+                                <i class="fas fa-refresh me-2"></i>Limpiar Filtros
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                        <h5 class="text-warning">No hay doctor disponible</h5>
+                        <p class="text-muted">No se encontró un doctor para mostrar la agenda.</p>
+                        <a href="{% url 'gestionar_citas' %}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+
+.card-header {
+    border-bottom: none;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+</style>
+{% endblock %} 

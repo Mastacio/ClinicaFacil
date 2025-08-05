@@ -1,0 +1,114 @@
+{% extends 'users/panel_base.html' %}
+
+{% block title %}Agregar Medicamento{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-gradient-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">
+                                <i class="fas fa-pills me-2"></i>
+                                Agregar Medicamento
+                            </h4>
+                            <small>{{ gestion.paciente.user.get_full_name }} - {{ gestion.cita.fecha|date:"d/m/Y" }}</small>
+                        </div>
+                        <a href="{% url 'gestion:gestionar_cita' gestion.cita.id %}?{{ request.GET.urlencode }}" class="btn btn-light btn-sm">
+                            <i class="fas fa-arrow-left me-1"></i>Volver
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.medicamento.id_for_label }}" class="form-label">
+                                    <i class="fas fa-pills me-1"></i>Medicamento
+                                </label>
+                                {{ form.medicamento }}
+                                {% if form.medicamento.errors %}
+                                    <div class="text-danger small">{{ form.medicamento.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.dosis.id_for_label }}" class="form-label">
+                                    <i class="fas fa-balance-scale me-1"></i>Dosis
+                                </label>
+                                {{ form.dosis }}
+                                {% if form.dosis.errors %}
+                                    <div class="text-danger small">{{ form.dosis.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.frecuencia.id_for_label }}" class="form-label">
+                                    <i class="fas fa-clock me-1"></i>Frecuencia
+                                </label>
+                                {{ form.frecuencia }}
+                                {% if form.frecuencia.errors %}
+                                    <div class="text-danger small">{{ form.frecuencia.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.duracion.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar-alt me-1"></i>Duración
+                                </label>
+                                {{ form.duracion }}
+                                {% if form.duracion.errors %}
+                                    <div class="text-danger small">{{ form.duracion.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.fecha_inicio.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar-plus me-1"></i>Fecha de Inicio
+                                </label>
+                                {{ form.fecha_inicio }}
+                                {% if form.fecha_inicio.errors %}
+                                    <div class="text-danger small">{{ form.fecha_inicio.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.fecha_fin.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar-minus me-1"></i>Fecha de Fin
+                                </label>
+                                {{ form.fecha_fin }}
+                                {% if form.fecha_fin.errors %}
+                                    <div class="text-danger small">{{ form.fecha_fin.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.instrucciones.id_for_label }}" class="form-label">
+                                <i class="fas fa-clipboard-list me-1"></i>Instrucciones Especiales
+                            </label>
+                            {{ form.instrucciones }}
+                            {% if form.instrucciones.errors %}
+                                <div class="text-danger small">{{ form.instrucciones.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'gestion:gestionar_cita' gestion.cita.id %}?{{ request.GET.urlencode }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Agregar Medicamento
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

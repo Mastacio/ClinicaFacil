@@ -1,0 +1,404 @@
+================================================================================
+                    DOCUMENTACIÓN DEL SISTEMA DE SEGURIDAD
+                           CLINICAFACIL - DJANGO
+================================================================================
+
+Fecha de Creación: 2025-08-05
+Versión: 1.0
+Autor: Sistema de Gestión Médica ClínicaFácil
+
+================================================================================
+                                ÍNDICE
+================================================================================
+
+1. SISTEMA DE ROLES
+2. DECORADORES DE SEGURIDAD
+3. MIDDLEWARE DE SEGURIDAD
+4. VALIDACIONES POR APLICACIÓN
+5. MATRIZ DE PERMISOS
+6. PÁGINA DE ERRORES
+7. CONFIGURACIÓN DEL SISTEMA
+8. EJEMPLOS DE USO
+9. TROUBLESHOOTING
+
+================================================================================
+                            1. SISTEMA DE ROLES
+================================================================================
+
+El sistema utiliza un modelo de usuario personalizado con los siguientes roles:
+
+ROLES DISPONIBLES:
+- admin: Administrador del sistema
+- paciente: Pacientes del sistema
+- doctor: Doctores del sistema
+- asistente: Asistentes médicos
+
+DEFINICIÓN EN MODELS.PY:
+```python
+class User(AbstractUser):
+    ROLE_CHOICES = [
+        ('admin', 'Administrador'),
+        ('paciente', 'Paciente'),
+        ('doctor', 'Doctor'),
+        ('asistente', 'Asistente'),
+    ]
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='paciente')
+```
+
+================================================================================
+                        2. DECORADORES DE SEGURIDAD
+================================================================================
+
+Ubicación: users/decorators.py
+
+DECORADORES PRINCIPALES:
+
+1. @role_required(allowed_roles)
+   - Valida que el usuario tenga uno de los roles permitidos
+   - Uso: @role_required(['admin', 'doctor'])
+
+2. @admin_required
+   - Solo administradores pueden acceder
+   - Uso: @admin_required
+
+3. @doctor_required
+   - Administradores y doctores pueden acceder
+   - Uso: @doctor_required
+
+4. @asistente_required
+   - Administradores y asistentes pueden acceder
+   - Uso: @asistente_required
+
+5. @paciente_required
+   - Solo pacientes pueden acceder
+   - Uso: @paciente_required
+
+6. @staff_required
+   - Personal administrativo (admin, doctor, asistente)
+   - Uso: @staff_required
+
+DECORADORES ESPECIALIZADOS:
+
+7. @owner_required(model_class, pk_name='pk')
+   - Verifica que el usuario sea dueño del objeto
+   - Uso: @owner_required(DoctorPerfil)
+
+8. @cita_owner_required
+   - Permisos específicos para citas
+   - Doctores: solo sus citas
+   - Pacientes: solo sus citas
+   - Asistentes: todas las citas
+   - Admin: todas las citas
+
+EJEMPLOS DE USO:
+```python
+from users.decorators import admin_required, role_required
+
+@admin_required
+def crear_doctor(request):
+    # Solo admin puede crear doctores
+    pass
+
+@role_required(['admin', 'doctor'])
+def gestionar_pacientes(request):
+    # Admin y doctores pueden gestionar pacientes
+    pass
+
+@paciente_required
+def mis_citas(request):
+    # Solo pacientes pueden ver sus citas
+    pass
+```
+
+================================================================================
+                        3. MIDDLEWARE DE SEGURIDAD
+================================================================================
+
+Ubicación: users/middleware.py
+
+FUNCIONALIDAD:
+- Validación en tiempo real de permisos
+- Bloqueo de URLs según el rol del usuario
+- Mensajes de error informativos
+
+RESTRICCIONES POR ROL:
+
+PACIENTES:
+- No pueden acceder a: /doctores/, /gestion/, /admin/
+
+DOCTORES:
+- No pueden acceder a: /admin/
+
+ASISTENTES:
+- No pueden acceder a: /admin/
+
+ADMINISTRADORES:
+- Acceso completo a todas las secciones
+
+URLS EXCLUIDAS DE VALIDACIÓN:
+- /login/
+- /logout/
+- /registro/
+- /panel/
+- /welcome/
+- /
+- /static/
+- /media/
+
+CONFIGURACIÓN EN SETTINGS.PY:
+```python
+MIDDLEWARE = [
+    # ... otros middlewares
+    'users.middleware.RoleMiddleware',
+]
+```
+
+================================================================================
+                        4. VALIDACIONES POR APLICACIÓN
+================================================================================
+
+CITAS (citas/views.py):
+- api_buscar_pacientes: @staff_required
+- api_buscar_doctores: @staff_required
+- calendario_doctor: @doctor_required
+- gestionar_citas: @staff_required
+- crear_cita: @staff_required
+- crear_cita_modal: @staff_required
+- ver_cita: @cita_owner_required
+- cancelar_cita: @staff_required
+- agenda_doctor: @doctor_required
+- cancelar_cita_agenda: @doctor_required
+- mis_citas: @paciente_required
+- crear_cita_paciente: @paciente_required
+- cancelar_cita_paciente: @paciente_required
+
+DOCTORES (doctores/views.py):
+- gestionar_doctores: @role_required(['admin', 'asistente'])
+- crear_doctor: @admin_required
+- ver_doctor: @role_required(['admin', 'asistente'])
+- editar_doctor: @admin_required
+- activar_desactivar_doctor: @admin_required
+- agregar_horario: @admin_required
+- eliminar_horario: @admin_required
+
+PACIENTES (pacientes/views.py):
+- gestionar_pacientes: @role_required(['admin', 'doctor'])
+- crear_paciente: @role_required(['admin', 'doctor'])
+- ver_paciente: @role_required(['admin', 'doctor'])
+- editar_paciente: @role_required(['admin', 'doctor'])
+- activar_desactivar_paciente: @role_required(['admin', 'doctor'])
+
+GESTIÓN (gestion/views.py):
+- gestionar_cita: @role_required(['admin', 'doctor'])
+- agregar_medicamento: @role_required(['admin', 'doctor'])
+- agregar_analisis: @role_required(['admin', 'doctor'])
+- eliminar_medicamento: @role_required(['admin', 'doctor'])
+- eliminar_analisis: @role_required(['admin', 'doctor'])
+- cambiar_estado_medicamento: @role_required(['admin', 'doctor'])
+- cambiar_estado_analisis: @role_required(['admin', 'doctor'])
+- imprimir_prescripcion: @role_required(['admin', 'doctor'])
+- imprimir_analisis: @role_required(['admin', 'doctor'])
+
+================================================================================
+                            5. MATRIZ DE PERMISOS
+================================================================================
+
+| Funcionalidad              | Admin | Doctor | Asistente | Paciente |
+|----------------------------|-------|--------|-----------|----------|
+| Gestión de Doctores       |   ✅   |   ❌   |     ✅     |    ❌    |
+| Gestión de Pacientes      |   ✅   |   ✅   |     ❌     |    ❌    |
+| Gestión de Citas          |   ✅   |   ✅   |     ✅     |    ❌    |
+| Mi Agenda                 |   ✅   |   ✅   |     ❌     |    ❌    |
+| Mis Citas                 |   ✅   |   ❌   |     ❌     |    ✅    |
+| Gestión Médica            |   ✅   |   ✅   |     ❌     |    ❌    |
+| Administración            |   ✅   |   ❌   |     ❌     |    ❌    |
+| Crear Citas               |   ✅   |   ✅   |     ✅     |    ✅    |
+| Ver Citas Propias         |   ✅   |   ✅   |     ✅     |    ✅    |
+| Cancelar Citas Propias    |   ✅   |   ✅   |     ✅     |    ✅    |
+
+================================================================================
+                            6. PÁGINA DE ERRORES
+================================================================================
+
+TEMPLATE: users/templates/users/error_403.html
+
+CARACTERÍSTICAS:
+- Diseño atractivo usando base_auth.html
+- Muestra información del usuario actual
+- Indica el rol del usuario
+- Botones para navegación
+- Mensaje informativo sobre el error
+
+FUNCIONALIDAD:
+- Explica el problema de permisos
+- Muestra el rol actual del usuario
+- Proporciona opciones de navegación
+- Diseño responsive y profesional
+
+CONFIGURACIÓN:
+```python
+# En core/urls.py
+handler403 = 'users.views.error_403'
+
+# En users/urls.py
+path('error/403/', error_403, name='error_403'),
+```
+
+================================================================================
+                        7. CONFIGURACIÓN DEL SISTEMA
+================================================================================
+
+SETTINGS.PY (core/settings.py):
+```python
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'users.middleware.RoleMiddleware',  # ← MIDDLEWARE AGREGADO
+]
+
+# Configuración para usar el modelo de usuario personalizado
+AUTH_USER_MODEL = 'users.User'
+```
+
+URLS.PY (core/urls.py):
+```python
+from users.views import error_403
+
+urlpatterns = [
+    # ... URLs existentes
+]
+
+# Handlers de error
+handler403 = 'users.views.error_403'
+```
+
+================================================================================
+                            8. EJEMPLOS DE USO
+================================================================================
+
+EJEMPLO 1: Vista solo para administradores
+```python
+from users.decorators import admin_required
+
+@admin_required
+def crear_doctor(request):
+    # Solo administradores pueden acceder
+    pass
+```
+
+EJEMPLO 2: Vista para múltiples roles
+```python
+from users.decorators import role_required
+
+@role_required(['admin', 'doctor', 'asistente'])
+def gestionar_citas(request):
+    # Admin, doctores y asistentes pueden acceder
+    pass
+```
+
+EJEMPLO 3: Vista específica para pacientes
+```python
+from users.decorators import paciente_required
+
+@paciente_required
+def mis_citas(request):
+    # Solo pacientes pueden acceder
+    pass
+```
+
+EJEMPLO 4: Verificar propiedad de objeto
+```python
+from users.decorators import owner_required
+from doctores.models import DoctorPerfil
+
+@owner_required(DoctorPerfil)
+def editar_doctor(request, pk):
+    # Solo el dueño del perfil o admin puede acceder
+    pass
+```
+
+EJEMPLO 5: Permisos específicos para citas
+```python
+from users.decorators import cita_owner_required
+
+@cita_owner_required
+def ver_cita(request, pk):
+    # Permisos específicos según el rol y la cita
+    pass
+```
+
+================================================================================
+                            9. TROUBLESHOOTING
+================================================================================
+
+PROBLEMA: Usuario no puede acceder a una vista
+SOLUCIÓN:
+1. Verificar que el usuario tenga un rol asignado
+2. Verificar que el decorador sea el correcto
+3. Verificar que el middleware esté activo
+4. Revisar los logs de Django
+
+PROBLEMA: Error 403 aparece frecuentemente
+SOLUCIÓN:
+1. Verificar configuración del middleware
+2. Verificar que las URLs excluidas estén correctas
+3. Verificar que el handler403 esté configurado
+
+PROBLEMA: Decorador no funciona
+SOLUCIÓN:
+1. Verificar import del decorador
+2. Verificar sintaxis del decorador
+3. Verificar que el usuario esté autenticado
+
+PROBLEMA: Middleware bloquea acceso legítimo
+SOLUCIÓN:
+1. Verificar URLs excluidas en el middleware
+2. Verificar lógica de validación por rol
+3. Verificar configuración en settings.py
+
+COMANDOS ÚTILES:
+```bash
+# Verificar configuración
+python manage.py check
+
+# Ejecutar servidor en modo debug
+python manage.py runserver
+
+# Ver logs de Django
+tail -f /path/to/django.log
+```
+
+================================================================================
+                          10. MEJORAS FUTURAS
+================================================================================
+
+POSIBLES MEJORAS:
+1. Logging de intentos de acceso denegado
+2. Sistema de auditoría más detallado
+3. Permisos granulares por acción
+4. Sistema de roles dinámicos
+5. Integración con LDAP/Active Directory
+6. Autenticación de dos factores
+7. Rate limiting por IP
+8. Bloqueo temporal de cuentas
+
+================================================================================
+                          11. CONTACTO
+================================================================================
+
+Para soporte técnico o preguntas sobre el sistema de seguridad:
+- Revisar esta documentación
+- Verificar logs del sistema
+- Contactar al equipo de desarrollo
+
+================================================================================
+                                FIN
+================================================================================
+
+Última actualización: 2025-08-05
+Versión del documento: 1.0 

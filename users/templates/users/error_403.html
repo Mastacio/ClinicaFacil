@@ -1,0 +1,63 @@
+{% extends 'base_auth.html' %}
+
+{% block title %}Acceso Denegado - ClínicaFácil{% endblock %}
+
+{% block content %}
+<div class="container d-flex align-items-center justify-content-center min-vh-100">
+    <div class="card shadow-lg border-0 p-4 p-md-5 auth-card" style="max-width: 500px; width: 100%;">
+        <div class="text-center mb-4">
+            <div class="mb-3">
+                <i class="fas fa-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
+            </div>
+            <h2 class="fw-bold text-danger mb-2">Acceso Denegado</h2>
+            <p class="text-muted mb-0">No tienes permisos para acceder a esta página</p>
+        </div>
+        
+        <div class="card-body text-center">
+            <div class="alert alert-warning border-0 shadow-sm mb-4">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-shield-alt me-2"></i>
+                    <div>
+                        <strong>Error 403 - Acceso Denegado</strong><br>
+                        <small>Tu rol actual no tiene permisos para acceder a esta sección.</small>
+                    </div>
+                </div>
+            </div>
+            
+            {% if user.is_authenticated %}
+            <div class="mb-4">
+                <h5 class="text-muted">Información de tu cuenta:</h5>
+                <div class="row text-start">
+                    <div class="col-6">
+                        <strong>Usuario:</strong><br>
+                        <span class="text-muted">{{ user.username }}</span>
+                    </div>
+                    <div class="col-6">
+                        <strong>Rol:</strong><br>
+                        <span class="badge bg-primary">{{ user.get_role_display }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="d-grid gap-3">
+                <a href="{% url 'welcome' %}" class="btn btn-primary">
+                    <i class="fas fa-home me-2"></i>
+                    Volver al Inicio
+                </a>
+                <a href="{% url 'login' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-sign-in-alt me-2"></i>
+                    Iniciar Sesión con otra cuenta
+                </a>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <small class="text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                Si crees que esto es un error, contacta al administrador
+            </small>
+        </div>
+    </div>
+</div>
+{% endblock %} 

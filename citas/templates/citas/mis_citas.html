@@ -1,0 +1,273 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mis Citas - ClínicaFácil{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">
+                <i class="fas fa-calendar-check text-primary me-2"></i>
+                Mis Citas
+            </h1>
+            <p class="text-muted">Gestiona tus citas médicas</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'crear_cita_paciente' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>
+                Nueva Cita
+            </a>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total de Citas
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_citas }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Pendientes
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ citas_pendientes }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Confirmadas
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ citas_confirmadas }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Completadas
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ citas_completadas }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Filtros</h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="estado" class="form-label">Estado</label>
+                    <select name="estado" id="estado" class="form-select">
+                        <option value="">Todos los estados</option>
+                        {% for value, label in estados_choices %}
+                        <option value="{{ value }}" {% if estado_filtro == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="fecha" class="form-label">Fecha</label>
+                    <input type="date" name="fecha" id="fecha" class="form-control" value="{{ fecha_filtro|default:'' }}">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-search me-1"></i>
+                        Filtrar
+                    </button>
+                    <a href="{% url 'mis_citas' %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-1"></i>
+                        Limpiar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de Citas -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Mis Citas</h6>
+            <span class="badge bg-primary">{{ citas.count }} citas</span>
+        </div>
+        <div class="card-body">
+            {% if citas %}
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Doctor</th>
+                            <th>Motivo</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cita in citas %}
+                        <tr>
+                            <td>
+                                <strong>{{ cita.fecha|date:"d/m/Y" }}</strong>
+                                <br>
+                                <small class="text-muted">{{ cita.fecha|date:"l" }}</small>
+                            </td>
+                            <td>
+                                <strong>{{ cita.hora_inicio|time:"H:i" }}</strong>
+                                <br>
+                                <small class="text-muted">a {{ cita.hora_fin|time:"H:i" }}</small>
+                            </td>
+                            <td>
+                                <strong>{{ cita.doctor.user.get_full_name }}</strong>
+                                <br>
+                                <small class="text-muted">{{ cita.doctor.especialidad }}</small>
+                            </td>
+                            <td>
+                                <span class="text-truncate d-inline-block" style="max-width: 200px;" title="{{ cita.motivo }}">
+                                    {{ cita.motivo }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if cita.estado == 'pendiente' %}
+                                    <span class="badge bg-warning text-dark">Pendiente</span>
+                                {% elif cita.estado == 'confirmada' %}
+                                    <span class="badge bg-success">Confirmada</span>
+                                {% elif cita.estado == 'completada' %}
+                                    <span class="badge bg-info">Completada</span>
+                                {% elif cita.estado == 'cancelada' %}
+                                    <span class="badge bg-danger">Cancelada</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'ver_cita' cita.pk %}" class="btn btn-sm btn-outline-primary" title="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% if cita.estado == 'pendiente' %}
+                                    <a href="{% url 'confirmar_cita_paciente' cita.pk %}" 
+                                       class="btn btn-sm btn-success" 
+                                       title="Confirmar cita"
+                                       onclick="return confirm('¿Estás seguro de que quieres confirmar esta cita?')">
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                    <a href="{% url 'cancelar_cita_paciente' cita.pk %}" 
+                                       class="btn btn-sm btn-outline-danger" 
+                                       title="Cancelar cita"
+                                       onclick="return confirm('¿Estás seguro de que quieres cancelar esta cita?')">
+                                        <i class="fas fa-times"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No tienes citas</h5>
+                <p class="text-muted">No se encontraron citas con los filtros aplicados.</p>
+                <a href="{% url 'crear_cita_paciente' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>
+                    Agendar mi primera cita
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal para ver detalles de la cita -->
+<div class="modal fade" id="citaModal" tabindex="-1" aria-labelledby="citaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="citaModalLabel">Detalles de la Cita</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="citaModalBody">
+                <!-- Contenido dinámico -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Inicializar DataTable
+    $('#dataTable').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"
+        },
+        "order": [[0, "desc"], [1, "asc"]],
+        "pageLength": 10,
+        "responsive": true
+    });
+
+    // Cargar detalles de cita en modal
+    $('.btn-view-cita').click(function(e) {
+        e.preventDefault();
+        var url = $(this).attr('href');
+        
+        $.get(url, function(data) {
+            $('#citaModalBody').html(data);
+            $('#citaModal').modal('show');
+        });
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,124 @@
+{% extends 'users/panel_base.html' %}
+{% block panel_content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <h4 class="mb-0">
+            <i class="fas fa-calendar-check me-2"></i>
+            Detalle de la Cita
+          </h4>
+          <span class="badge bg-light text-dark fs-6">
+            {% if cita.estado == 'pendiente' %}
+              <i class="fas fa-clock me-1"></i>Pendiente
+            {% elif cita.estado == 'confirmada' %}
+              <i class="fas fa-check me-1"></i>Confirmada
+            {% elif cita.estado == 'completada' %}
+              <i class="fas fa-check-double me-1"></i>Completada
+            {% elif cita.estado == 'cancelada' %}
+              <i class="fas fa-times me-1"></i>Cancelada
+            {% endif %}
+          </span>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h6 class="text-primary mb-3">
+                <i class="fas fa-user me-2"></i>Información del Paciente
+              </h6>
+              <dl class="row">
+                <dt class="col-sm-4">Nombre</dt>
+                <dd class="col-sm-8">{{ cita.paciente.user.get_full_name }}</dd>
+                <dt class="col-sm-4">Email</dt>
+                <dd class="col-sm-8">{{ cita.paciente.user.email }}</dd>
+                <dt class="col-sm-4">Teléfono</dt>
+                <dd class="col-sm-8">{{ cita.paciente.telefono|default:'No especificado' }}</dd>
+              </dl>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-primary mb-3">
+                <i class="fas fa-user-md me-2"></i>Información del Doctor
+              </h6>
+              <dl class="row">
+                <dt class="col-sm-4">Nombre</dt>
+                <dd class="col-sm-8">{{ cita.doctor.user.get_full_name }}</dd>
+                <dt class="col-sm-4">Especialidad</dt>
+                <dd class="col-sm-8">{{ cita.doctor.especialidad }}</dd>
+                <dt class="col-sm-4">Email</dt>
+                <dd class="col-sm-8">{{ cita.doctor.user.email }}</dd>
+              </dl>
+            </div>
+          </div>
+          
+          <hr class="my-4">
+          
+          <h6 class="text-primary mb-3">
+            <i class="fas fa-calendar-alt me-2"></i>Detalles de la Cita
+          </h6>
+          <dl class="row">
+            <dt class="col-sm-3">Fecha</dt>
+            <dd class="col-sm-9">{{ cita.fecha|date:"d/m/Y" }} ({{ cita.fecha|date:"l" }})</dd>
+            <dt class="col-sm-3">Hora</dt>
+            <dd class="col-sm-9">{{ cita.hora_inicio|time:"H:i" }} - {{ cita.hora_fin|time:"H:i" }}</dd>
+            <dt class="col-sm-3">Motivo</dt>
+            <dd class="col-sm-9">{{ cita.motivo }}</dd>
+            {% if cita.notas %}
+            <dt class="col-sm-3">Notas</dt>
+            <dd class="col-sm-9">{{ cita.notas }}</dd>
+            {% endif %}
+            <dt class="col-sm-3">Creada por</dt>
+            <dd class="col-sm-9">{{ cita.creada_por.get_full_name|default:'Sistema' }}</dd>
+            <dt class="col-sm-3">Fecha de creación</dt>
+            <dd class="col-sm-9">{{ cita.creada_en|date:"d/m/Y H:i" }}</dd>
+          </dl>
+          
+          <hr class="my-4">
+          
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver
+              </a>
+            </div>
+            <div class="btn-group" role="group">
+              {% if cita.estado == 'pendiente' %}
+                {% if user.role == 'admin' or user.role == 'asistente' or cita.doctor.user == user %}
+                  <a href="{% url 'confirmar_cita' cita.pk %}" 
+                     class="btn btn-success"
+                     onclick="return confirm('¿Estás seguro de que quieres confirmar esta cita?')">
+                    <i class="fas fa-check me-2"></i>Confirmar
+                  </a>
+                {% endif %}
+                {% if user.role == 'paciente' and cita.paciente.user == user %}
+                  <a href="{% url 'confirmar_cita_paciente' cita.pk %}" 
+                     class="btn btn-success"
+                     onclick="return confirm('¿Estás seguro de que quieres confirmar esta cita?')">
+                    <i class="fas fa-check me-2"></i>Confirmar
+                  </a>
+                {% endif %}
+                <a href="{% url 'cancelar_cita' cita.pk %}" 
+                   class="btn btn-outline-danger"
+                   onclick="return confirm('¿Estás seguro de que quieres cancelar esta cita?')">
+                  <i class="fas fa-times me-2"></i>Cancelar
+                </a>
+              {% elif cita.estado == 'confirmada' %}
+                <a href="{% url 'cancelar_cita' cita.pk %}" 
+                   class="btn btn-outline-danger"
+                   onclick="return confirm('¿Estás seguro de que quieres cancelar esta cita?')">
+                  <i class="fas fa-times me-2"></i>Cancelar
+                </a>
+              {% endif %}
+              {% if user.role == 'admin' or user.role == 'asistente' or cita.doctor.user == user %}
+                <a href="{% url 'gestion:gestionar_cita' cita.pk %}" class="btn btn-primary">
+                  <i class="fas fa-cogs me-2"></i>Gestionar
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

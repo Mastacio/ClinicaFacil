@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="flex-fill">
+    {% block panel_content %}{% endblock %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    {% block gestion_js %}{% endblock %}
+{% endblock %}

@@ -1,0 +1,624 @@
+{% extends 'users/panel_base.html' %}
+
+{% block title %}Gestionar Cita - {{ cita.paciente }}{% endblock %}
+
+{% block gestion_js %}
+<script>
+console.log('=== SCRIPT DE IMPRESIÓN CARGADO ===');
+console.log('DOM ready state:', document.readyState);
+
+// Esperar a que el DOM esté completamente cargado
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM cargado, configurando event listeners...');
+    
+    // Función para marcar como completada
+    window.marcarCompletada = function() {
+        // Cambiar el estado a completada
+        document.getElementById('{{ form.estado.id_for_label }}').value = 'completada';
+        
+        // Mostrar confirmación
+        if (confirm('¿Estás seguro de que quieres marcar esta gestión como completada?')) {
+            // Enviar el formulario
+            document.querySelector('form').submit();
+        } else {
+            // Restaurar el estado anterior si se cancela
+            document.getElementById('{{ form.estado.id_for_label }}').value = '{{ gestion.estado }}';
+        }
+    };
+    
+    // Función para abrir modal de medicamentos
+    function abrirModalMedicamentos() {
+        console.log('=== FUNCIÓN abrirModalMedicamentos EJECUTADA ===');
+        console.log('Buscando modal:', document.getElementById('modalImpresionMedicamentos'));
+        console.log('Bootstrap disponible:', typeof bootstrap);
+        
+        try {
+            // Limpiar selecciones anteriores
+            const checkboxes = document.querySelectorAll('#formImpresionMedicamentos input[type="checkbox"]');
+            console.log('Checkboxes encontrados:', checkboxes.length);
+            checkboxes.forEach(cb => cb.checked = false);
+            
+            const modalElement = document.getElementById('modalImpresionMedicamentos');
+            console.log('Elemento modal:', modalElement);
+            
+            if (!modalElement) {
+                console.error('No se encontró el elemento modal');
+                alert('Error: No se encontró el modal de medicamentos');
+                return;
+            }
+            
+            const modal = new bootstrap.Modal(modalElement);
+            console.log('Modal creado:', modal);
+            modal.show();
+            console.log('Modal mostrado correctamente');
+        } catch (error) {
+            console.error('Error al abrir modal de medicamentos:', error);
+            alert('Error al abrir el modal de selección. Por favor, recarga la página.');
+        }
+    }
+    
+    // Función para abrir modal de análisis
+    function abrirModalAnalisis() {
+        console.log('=== FUNCIÓN abrirModalAnalisis EJECUTADA ===');
+        console.log('Buscando modal:', document.getElementById('modalImpresionAnalisis'));
+        console.log('Bootstrap disponible:', typeof bootstrap);
+        
+        try {
+            // Limpiar selecciones anteriores
+            const checkboxes = document.querySelectorAll('#formImpresionAnalisis input[type="checkbox"]');
+            console.log('Checkboxes encontrados:', checkboxes.length);
+            checkboxes.forEach(cb => cb.checked = false);
+            
+            const modalElement = document.getElementById('modalImpresionAnalisis');
+            console.log('Elemento modal:', modalElement);
+            
+            if (!modalElement) {
+                console.error('No se encontró el elemento modal');
+                alert('Error: No se encontró el modal de análisis');
+                return;
+            }
+            
+            const modal = new bootstrap.Modal(modalElement);
+            console.log('Modal creado:', modal);
+            modal.show();
+            console.log('Modal mostrado correctamente');
+        } catch (error) {
+            console.error('Error al abrir modal de análisis:', error);
+            alert('Error al abrir el modal de selección. Por favor, recarga la página.');
+        }
+    }
+    
+    // Función para imprimir medicamentos
+    window.imprimirMedicamentos = function() {
+        const medicamentosSeleccionados = [];
+        document.querySelectorAll('#formImpresionMedicamentos input[type="checkbox"]:checked').forEach(cb => {
+            medicamentosSeleccionados.push(cb.value);
+        });
+        
+        if (medicamentosSeleccionados.length === 0) {
+            alert('Debe seleccionar al menos un medicamento.');
+            return;
+        }
+        
+        if (medicamentosSeleccionados.length > 3) {
+            alert('No puede seleccionar más de 3 medicamentos por prescripción.');
+            return;
+        }
+        
+        // Construir URL con parámetros
+        const url = "{% url 'gestion:imprimir_prescripcion' gestion.id %}?" + 
+                    medicamentosSeleccionados.map(id => `medicamentos=${id}`).join('&');
+        
+        // Abrir en nueva ventana para impresión
+        const ventanaImpresion = window.open(url, '_blank', 'width=800,height=600');
+        
+        // Cerrar modal
+        try {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalImpresionMedicamentos'));
+            if (modal) {
+                modal.hide();
+            }
+        } catch (error) {
+            console.error('Error al cerrar modal:', error);
+        }
+    };
+    
+    // Función para imprimir análisis
+    window.imprimirAnalisis = function() {
+        const analisisSeleccionados = [];
+        document.querySelectorAll('#formImpresionAnalisis input[type="checkbox"]:checked').forEach(cb => {
+            analisisSeleccionados.push(cb.value);
+        });
+        
+        if (analisisSeleccionados.length === 0) {
+            alert('Debe seleccionar al menos un análisis.');
+            return;
+        }
+        
+        if (analisisSeleccionados.length > 3) {
+            alert('No puede seleccionar más de 3 análisis por solicitud.');
+            return;
+        }
+        
+        // Construir URL con parámetros
+        const url = "{% url 'gestion:imprimir_analisis' gestion.id %}?" + 
+                    analisisSeleccionados.map(id => `analisis=${id}`).join('&');
+        
+        // Abrir en nueva ventana para impresión
+        const ventanaImpresion = window.open(url, '_blank', 'width=800,height=600');
+        
+        // Cerrar modal
+        try {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalImpresionAnalisis'));
+            if (modal) {
+                modal.hide();
+            }
+        } catch (error) {
+            console.error('Error al cerrar modal:', error);
+        }
+    };
+    
+    // Configurar event listeners para los botones
+    const btnImprimirMedicamentos = document.getElementById('btnImprimirMedicamentos');
+    const btnImprimirAnalisis = document.getElementById('btnImprimirAnalisis');
+    
+    console.log('Buscando botones:', {
+        btnImprimirMedicamentos: btnImprimirMedicamentos,
+        btnImprimirAnalisis: btnImprimirAnalisis
+    });
+    
+    if (btnImprimirMedicamentos) {
+        console.log('Configurando event listener para botón de medicamentos');
+        btnImprimirMedicamentos.addEventListener('click', function(e) {
+            console.log('Botón de medicamentos clickeado!');
+            e.preventDefault();
+            abrirModalMedicamentos();
+        });
+    } else {
+        console.error('No se encontró el botón de medicamentos');
+    }
+    
+    if (btnImprimirAnalisis) {
+        console.log('Configurando event listener para botón de análisis');
+        btnImprimirAnalisis.addEventListener('click', function(e) {
+            console.log('Botón de análisis clickeado!');
+            e.preventDefault();
+            abrirModalAnalisis();
+        });
+    } else {
+        console.error('No se encontró el botón de análisis');
+    }
+    
+    console.log('Event listeners configurados correctamente');
+    
+    // Verificar que Bootstrap esté disponible
+    if (typeof bootstrap !== 'undefined') {
+        console.log('Bootstrap está disponible');
+    } else {
+        console.error('Bootstrap NO está disponible');
+    }
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header de la gestión -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #0d6efd, #0b5ed7);">
+                    <div class="row align-items-center">
+                        <!-- Información del Doctor y Fecha -->
+                        <div class="col-md-6 d-flex flex-column">
+                            <div class="d-flex align-items-center mb-1">
+                                <i class="fas fa-stethoscope me-2"></i>
+                                <h4 class="mb-0 fw-bold">Gestión de Cita</h4>
+                            </div>
+                            <small class="text-light">
+                                <span class="fw-semibold">Doctor:</span> {{ cita.doctor.user.get_full_name }}
+                                <span class="mx-2">|</span>
+                                <span class="fw-semibold">Fecha:</span> {{ cita.fecha|date:"d/m/Y" }}
+                            </small>
+                        </div>
+                        <!-- Información del Paciente -->
+                        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                            <h5 class="mb-0 fw-bold">
+                                <i class="fas fa-user-injured me-2"></i>
+                                {{ cita.paciente.user.get_full_name }}
+                            </h5>
+                            <small class="text-light">
+                                <i class="fas fa-envelope me-1"></i>
+                                {{ cita.paciente.user.email }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Formulario de gestión -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>
+                        Información de la Consulta
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" {% if solo_lectura %}onsubmit="return false;"{% endif %}>
+                        {% csrf_token %}
+                        
+                        <!-- Campos hidden para preservar filtros -->
+                        {% if request.GET.fecha %}
+                            <input type="hidden" name="fecha" value="{{ request.GET.fecha }}">
+                        {% endif %}
+                        {% if request.GET.estado %}
+                            <input type="hidden" name="estado" value="{{ request.GET.estado }}">
+                        {% endif %}
+                        {% if request.GET.paciente %}
+                            <input type="hidden" name="paciente" value="{{ request.GET.paciente }}">
+                        {% endif %}
+                        {% if request.GET.doctor %}
+                            <input type="hidden" name="doctor" value="{{ request.GET.doctor }}">
+                        {% endif %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.motivo_consulta.id_for_label }}" class="form-label">
+                                    <i class="fas fa-clipboard-list me-1"></i>Motivo de Consulta
+                                </label>
+                                {% if solo_lectura %}
+                                    <div class="form-control bg-light">{{ form.motivo_consulta.value }}</div>
+                                {% else %}
+                                    {{ form.motivo_consulta }}
+                                {% endif %}
+                                {% if form.motivo_consulta.errors %}
+                                    <div class="text-danger small">{{ form.motivo_consulta.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.estado.id_for_label }}" class="form-label">
+                                    <i class="fas fa-tasks me-1"></i>Estado
+                                </label>
+                                {% if solo_lectura %}
+                                    <div class="form-control bg-light">{{ gestion.get_estado_display }}</div>
+                                {% else %}
+                                    {{ form.estado }}
+                                {% endif %}
+                                {% if form.estado.errors %}
+                                    <div class="text-danger small">{{ form.estado.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.sintomas.id_for_label }}" class="form-label">
+                                <i class="fas fa-thermometer-half me-1"></i>Síntomas
+                            </label>
+                            {% if solo_lectura %}
+                                <div class="form-control bg-light">{{ form.sintomas.value }}</div>
+                            {% else %}
+                                {{ form.sintomas }}
+                            {% endif %}
+                            {% if form.sintomas.errors %}
+                                <div class="text-danger small">{{ form.sintomas.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.diagnostico.id_for_label }}" class="form-label">
+                                <i class="fas fa-heartbeat me-1"></i>Diagnóstico
+                            </label>
+                            {% if solo_lectura %}
+                                <div class="form-control bg-light">{{ form.diagnostico.value }}</div>
+                            {% else %}
+                                {{ form.diagnostico }}
+                            {% endif %}
+                            {% if form.diagnostico.errors %}
+                                <div class="text-danger small">{{ form.diagnostico.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.observaciones.id_for_label }}" class="form-label">
+                                    <i class="fas fa-notes-medical me-1"></i>Observaciones
+                                </label>
+                                {% if solo_lectura %}
+                                    <div class="form-control bg-light">{{ form.observaciones.value }}</div>
+                                {% else %}
+                                    {{ form.observaciones }}
+                                {% endif %}
+                                {% if form.observaciones.errors %}
+                                    <div class="text-danger small">{{ form.observaciones.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.proxima_cita.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar-plus me-1"></i>Próxima Cita
+                                </label>
+                                {% if solo_lectura %}
+                                    <div class="form-control bg-light">{{ form.proxima_cita.value }}</div>
+                                {% else %}
+                                    {{ form.proxima_cita }}
+                                {% endif %}
+                                {% if form.proxima_cita.errors %}
+                                    <div class="text-danger small">{{ form.proxima_cita.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.recomendaciones.id_for_label }}" class="form-label">
+                                <i class="fas fa-lightbulb me-1"></i>Recomendaciones
+                            </label>
+                            {% if solo_lectura %}
+                                <div class="form-control bg-light">{{ form.recomendaciones.value }}</div>
+                            {% else %}
+                                {{ form.recomendaciones }}
+                            {% endif %}
+                            {% if form.recomendaciones.errors %}
+                                <div class="text-danger small">{{ form.recomendaciones.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        {% if not solo_lectura %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'agenda_doctor' %}?{{ request.GET.urlencode }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Volver
+                            </a>
+                            <div>
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="fas fa-save me-2"></i>Guardar Gestión
+                                </button>
+                                <button type="button" class="btn btn-success" onclick="marcarCompletada()">
+                                    <i class="fas fa-check-circle me-2"></i>Siguiente
+                                </button>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="d-flex justify-content-end">
+                            <a href="{% url 'agenda_doctor' %}?{{ request.GET.urlencode }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Volver
+                            </a>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Botones de Impresión -->
+                        {% if medicamentos_asignados or analisis_asignados %}
+                        <div class="mt-4">
+                            <h6 class="mb-3">
+                                <i class="fas fa-print me-2"></i>Impresión
+                            </h6>
+                            
+                            {% if medicamentos_asignados %}
+                            <div class="mb-3">
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="btnImprimirMedicamentos">
+                                    <i class="fas fa-pills me-1"></i>Imprimir Prescripción
+                                </button>
+                            </div>
+                            {% endif %}
+                            
+                            {% if analisis_asignados %}
+                            <div class="mb-3">
+                                <button type="button" class="btn btn-outline-info btn-sm" id="btnImprimirAnalisis">
+                                    <i class="fas fa-flask me-1"></i>Imprimir Análisis
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de acciones -->
+        <div class="col-lg-4">
+            <!-- Medicamentos -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="fas fa-pills me-2"></i>Medicamentos
+                    </h6>
+                    {% if not solo_lectura %}
+                    <a href="{% url 'gestion:agregar_medicamento' gestion.id %}?{{ request.GET.urlencode }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus me-1"></i>Agregar
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if medicamentos_asignados %}
+                        {% for medicamento in medicamentos_asignados %}
+                            <div class="border rounded p-3 mb-2">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">{{ medicamento.medicamento.nombre }}</h6>
+                                        <small class="text-muted">
+                                            <strong>Dosis:</strong> {{ medicamento.dosis }}<br>
+                                            <strong>Frecuencia:</strong> {{ medicamento.frecuencia }}<br>
+                                            <strong>Duración:</strong> {{ medicamento.duracion }}
+                                        </small>
+                                        {% if medicamento.instrucciones %}
+                                            <div class="mt-2">
+                                                <small class="text-muted">{{ medicamento.instrucciones }}</small>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="ms-2">
+                                        <span class="badge bg-{% if medicamento.estado == 'activa' %}success{% elif medicamento.estado == 'completada' %}info{% else %}secondary{% endif %}">
+                                            {{ medicamento.get_estado_display }}
+                                        </span>
+                                    </div>
+                                </div>
+                                {% if not solo_lectura %}
+                                <div class="mt-2">
+                                    <a href="{% url 'gestion:eliminar_medicamento' medicamento.id %}?{{ request.GET.urlencode }}" 
+                                       class="btn btn-sm btn-outline-danger"
+                                       onclick="return confirm('¿Estás seguro de eliminar este medicamento?')">
+                                        <i class="fas fa-trash me-1"></i>Eliminar
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center text-muted py-3">
+                            <i class="fas fa-pills fa-2x mb-2"></i>
+                            <p class="mb-0">No hay medicamentos asignados</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Análisis -->
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="fas fa-flask me-2"></i>Análisis
+                    </h6>
+                    {% if not solo_lectura %}
+                    <a href="{% url 'gestion:agregar_analisis' gestion.id %}?{{ request.GET.urlencode }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus me-1"></i>Agregar
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if analisis_asignados %}
+                        {% for analisis in analisis_asignados %}
+                            <div class="border rounded p-3 mb-2">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">{{ analisis.analisis.nombre }}</h6>
+                                        <small class="text-muted">
+                                            <strong>Tipo:</strong> {{ analisis.analisis.tipo }}<br>
+                                            {% if analisis.fecha_programada %}
+                                                <strong>Fecha:</strong> {{ analisis.fecha_programada|date:"d/m/Y" }}
+                                            {% endif %}
+                                        </small>
+                                        {% if analisis.instrucciones %}
+                                            <div class="mt-2">
+                                                <small class="text-muted">{{ analisis.instrucciones }}</small>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="ms-2">
+                                        <span class="badge bg-{% if analisis.estado == 'solicitado' %}warning{% elif analisis.estado == 'en_proceso' %}info{% elif analisis.estado == 'completado' %}success{% else %}secondary{% endif %}">
+                                            {{ analisis.get_estado_display }}
+                                        </span>
+                                    </div>
+                                </div>
+                                {% if not solo_lectura %}
+                                <div class="mt-2">
+                                    <a href="{% url 'gestion:eliminar_analisis' analisis.id %}?{{ request.GET.urlencode }}" 
+                                       class="btn btn-sm btn-outline-danger"
+                                       onclick="return confirm('¿Estás seguro de eliminar este análisis?')">
+                                        <i class="fas fa-trash me-1"></i>Eliminar
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center text-muted py-3">
+                            <i class="fas fa-flask fa-2x mb-2"></i>
+                            <p class="mb-0">No hay análisis asignados</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para selección de medicamentos -->
+    <div class="modal fade" id="modalImpresionMedicamentos" tabindex="-1" aria-labelledby="modalImpresionMedicamentosLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalImpresionMedicamentosLabel">
+                        <i class="fas fa-pills me-2"></i>Seleccionar Medicamentos para Imprimir
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted mb-3">Selecciona hasta 3 medicamentos para imprimir en la prescripción:</p>
+                    <form id="formImpresionMedicamentos">
+                        {% if medicamentos_asignados %}
+                            {% for medicamento in medicamentos_asignados %}
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" name="medicamentos" value="{{ medicamento.id }}" id="medicamento_{{ medicamento.id }}">
+                                <label class="form-check-label" for="medicamento_{{ medicamento.id }}">
+                                    <strong>{{ medicamento.medicamento.nombre }}</strong><br>
+                                    <small class="text-muted">
+                                        Dosis: {{ medicamento.dosis }} | Frecuencia: {{ medicamento.frecuencia }}
+                                    </small>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>No hay medicamentos asignados para imprimir.
+                            </div>
+                        {% endif %}
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="imprimirMedicamentos()">
+                        <i class="fas fa-print me-1"></i>Imprimir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para selección de análisis -->
+    <div class="modal fade" id="modalImpresionAnalisis" tabindex="-1" aria-labelledby="modalImpresionAnalisisLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalImpresionAnalisisLabel">
+                        <i class="fas fa-flask me-2"></i>Seleccionar Análisis para Imprimir
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted mb-3">Selecciona hasta 3 análisis para imprimir en la solicitud:</p>
+                    <form id="formImpresionAnalisis">
+                        {% if analisis_asignados %}
+                            {% for analisis in analisis_asignados %}
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" name="analisis" value="{{ analisis.id }}" id="analisis_{{ analisis.id }}">
+                                <label class="form-check-label" for="analisis_{{ analisis.id }}">
+                                    <strong>{{ analisis.analisis.nombre }}</strong><br>
+                                    <small class="text-muted">
+                                        Tipo: {{ analisis.analisis.tipo }}
+                                        {% if analisis.fecha_programada %}
+                                        | Fecha: {{ analisis.fecha_programada|date:"d/m/Y" }}
+                                        {% endif %}
+                                    </small>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>No hay análisis asignados para imprimir.
+                            </div>
+                        {% endif %}
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-info" onclick="imprimirAnalisis()">
+                        <i class="fas fa-print me-1"></i>Imprimir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

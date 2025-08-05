@@ -1,0 +1,271 @@
+<div class="container-fluid">
+    <form method="post" action="/citas/crear/modal/" novalidate class="needs-validation" id="citaModalForm">
+        {% csrf_token %}
+        
+        <!-- Información de la cita -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-calendar-check me-2"></i>
+                    <strong>Nueva Cita</strong>
+                    {% if form.fecha.value %}
+                        <br><small class="text-muted">Fecha: {{ form.fecha.value }}</small>
+                    {% endif %}
+                    {% if form.hora_inicio.value %}
+                        <br><small class="text-muted">Hora inicio: {{ form.hora_inicio.value }}</small>
+                    {% endif %}
+                    {% if form.hora_fin.value %}
+                        <br><small class="text-muted">Hora fin: {{ form.hora_fin.value }}</small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Campos del formulario -->
+        {% for field in form %}
+            <div class="row mb-3">
+                <div class="col-12">
+                    <label for="{{ field.id_for_label }}" class="form-label fw-semibold">
+                        {% if field.name == 'paciente' %}
+                            <i class="fas fa-user me-2"></i>
+                        {% elif field.name == 'doctor' %}
+                            <i class="fas fa-user-md me-2"></i>
+                        {% elif field.name == 'motivo' %}
+                            <i class="fas fa-sticky-note me-2"></i>
+                        {% elif field.name == 'notas' %}
+                            <i class="fas fa-notes-medical me-2"></i>
+                        {% else %}
+                            <i class="fas fa-info-circle me-2"></i>
+                        {% endif %}
+                        {{ field.label }}
+                        {% if field.field.required %}
+                            <span class="text-danger">*</span>
+                        {% endif %}
+                    </label>
+                    
+                   
+                        {{ field }}
+                   
+                    
+                    {% if field.help_text %}
+                        <div class="form-text text-muted">{{ field.help_text }}</div>
+                    {% endif %}
+                    
+                    {% if field.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in field.errors %}
+                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+        {% endfor %}
+
+        <!-- Botones de acción -->
+        <div class="row mt-4">
+            <div class="col-12 d-flex justify-content-between">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button type="submit" class="btn btn-success" id="submitCitaBtn">
+                    <i class="fas fa-calendar-plus me-2"></i>Crear Cita
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+// Validación y envío del formulario
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('citaModalForm');
+    const submitBtn = document.getElementById('submitCitaBtn');
+    
+    // Función para calcular hora fin automáticamente
+    function calcularHoraFin() {
+        const horaInicioField = document.getElementById('id_hora_inicio');
+        const horaFinField = document.getElementById('id_hora_fin');
+        
+        if (horaInicioField && horaFinField && horaInicioField.value) {
+            try {
+                // Obtener la hora de inicio
+                const horaInicio = horaInicioField.value;
+                const [horas, minutos] = horaInicio.split(':').map(Number);
+                
+                // Calcular hora fin (intervalo por defecto de 30 minutos)
+                let horaFin = new Date();
+                horaFin.setHours(horas, minutos + 30, 0, 0);
+                
+                // Formatear hora fin
+                const horaFinStr = horaFin.getHours().toString().padStart(2, '0') + ':' + 
+                                 horaFin.getMinutes().toString().padStart(2, '0');
+                
+                horaFinField.value = horaFinStr;
+                
+                // Actualizar la información en el alert
+                const alertInfo = document.querySelector('.alert-info');
+                if (alertInfo) {
+                    const horaFinInfo = alertInfo.querySelector('.hora-fin-info');
+                    if (horaFinInfo) {
+                        horaFinInfo.textContent = `Hora fin: ${horaFinStr}`;
+                    } else {
+                        const horaFinElement = document.createElement('small');
+                        horaFinElement.className = 'text-muted hora-fin-info';
+                        horaFinElement.innerHTML = `<br>Hora fin: ${horaFinStr}`;
+                        alertInfo.appendChild(horaFinElement);
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error calculando hora fin:', error);
+            }
+        }
+    }
+    
+    // Event listener para calcular hora fin cuando cambie la hora de inicio
+    const horaInicioField = document.getElementById('id_hora_inicio');
+    if (horaInicioField) {
+        horaInicioField.addEventListener('change', calcularHoraFin);
+        horaInicioField.addEventListener('input', calcularHoraFin);
+    }
+    
+    // Calcular hora fin al cargar el formulario si ya hay hora de inicio
+    if (horaInicioField && horaInicioField.value) {
+        setTimeout(calcularHoraFin, 100);
+    }
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Validar formulario
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return;
+        }
+        
+        // Deshabilitar botón durante el envío
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creando...';
+        
+        // Obtener datos del formulario
+        const formData = new FormData(form);
+        
+        // Enviar formulario con AJAX
+        fetch('/citas/crear/modal/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
+            
+            // Verificar si la respuesta es JSON
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return response.json();
+            } else {
+                // Si no es JSON, obtener el texto
+                return response.text().then(text => {
+                    console.log('Response text:', text);
+                    throw new Error('Respuesta no es JSON válido');
+                });
+            }
+        })
+        .then(data => {
+            console.log('Response data:', data);
+            
+            if (data.success) {
+                // Éxito - mostrar mensaje de éxito
+                const modalBody = document.getElementById('crearCitaModalBody');
+                modalBody.innerHTML = `
+                    <div class="text-center py-5">
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <strong>¡Cita creada exitosamente!</strong><br>
+                            <small class="text-muted">La cita ha sido guardada correctamente.</small>
+                        </div>
+                        <div class="mt-3">
+                            <button type="button" class="btn btn-primary" onclick="location.reload()">
+                                <i class="fas fa-refresh me-2"></i>Actualizar Página
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                // Mostrar alerta de éxito en la página principal
+                const alertContainer = document.createElement('div');
+                alertContainer.className = 'alert alert-success alert-dismissible fade show position-fixed';
+                alertContainer.style.cssText = 'top: 20px; right: 20px; z-index: 10002; min-width: 300px;';
+                alertContainer.innerHTML = `
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>¡Cita creada exitosamente!</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.body.appendChild(alertContainer);
+                
+                // Auto-ocultar la alerta después de 5 segundos
+                setTimeout(() => {
+                    if (alertContainer.parentNode) {
+                        alertContainer.remove();
+                    }
+                }, 5000);
+                
+                // Cerrar modal después de 2 segundos
+                setTimeout(() => {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('crearCitaModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+                }, 2000);
+            } else {
+                // Error - mostrar errores
+                const modalBody = document.getElementById('crearCitaModalBody');
+                modalBody.innerHTML = data.html;
+                
+                // Rehabilitar botón
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-calendar-plus me-2"></i>Crear Cita';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            
+            // Mostrar error genérico
+            const modalBody = document.getElementById('crearCitaModalBody');
+            modalBody.innerHTML = `
+                <div class="text-center py-5">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Error al crear la cita</strong><br>
+                        <small class="text-muted">Por favor, inténtalo de nuevo.</small>
+                    </div>
+                    <div class="mt-3">
+                        <button type="button" class="btn btn-primary" onclick="location.reload()">
+                            <i class="fas fa-refresh me-2"></i>Recargar
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Rehabilitar botón
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-calendar-plus me-2"></i>Crear Cita';
+        });
+    });
+    
+    // Auto-hide alerts after 5 seconds
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+});
+</script>

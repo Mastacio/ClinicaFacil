@@ -1,0 +1,56 @@
+# Django
+*.log
+*.pot
+*.pyc
+__pycache__/
+db.sqlite3
+media/
+staticfiles/
+.env
+*.sqlite3
+*.pyo
+*.pyd
+*.db
+*.swp
+.DS_Store
+.idea/
+.vscode/
+*.egg-info/
+.eggs/
+*.bak
+*.tmp
+*.orig
+*.sass-cache/
+*.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.cache/
+.pytest_cache/
+celerybeat-schedule
+celerybeat.pid
+instance/
+.webassets-cache
+
+# VS Code
+.vscode/
+
+# OS generated files
+Thumbs.db
+Desktop.ini
+
+# pipenv
+Pipfile.lock
+
+# mypy
+.mypy_cache/
+.dmypy.json
+
+# pytest
+.cache/
+
+# virtualenv
+venv/
+ENV/
+env/

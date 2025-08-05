@@ -1,0 +1,450 @@
+{% extends 'base_nomenu.html' %}
+
+{% block content %}
+<!-- Hero Section con gradiente animado -->
+<section class="hero-section position-relative overflow-hidden">
+  <div class="hero-background"></div>
+  <div class="container position-relative">
+    <div class="row min-vh-100 align-items-center">
+      <div class="col-lg-6 text-white">
+        <div class="hero-content" data-aos="fade-right">
+          <h1 class="display-4 fw-bold mb-4">
+            <span class="text-gradient">{{ clinic.nombre|default:'ClínicaFácil' }}</span>
+            <br>{{ clinic.descripcion|default:'Tu Salud, Nuestra Prioridad' }}
+          </h1>
+          <p class="lead mb-4 opacity-75">
+            {{ clinic.nosotros|default:'Sistema integral de gestión médica que conecta doctores y pacientes para una atención más eficiente y personalizada.' }}
+          </p>
+          <div class="d-flex flex-wrap gap-3">
+            {% if user.is_authenticated %}
+              <a href="/panel/" class="btn btn-light btn-lg px-4 py-3 fw-semibold">
+                <i class="fas fa-user-md me-2"></i>Acceder al Panel
+              </a>
+            {% else %}
+              <a href="/login/" class="btn btn-light btn-lg px-4 py-3 fw-semibold me-3">
+                <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+              </a>
+              <a href="/registro/" class="btn btn-outline-light btn-lg px-4 py-3 fw-semibold">
+                <i class="fas fa-user-plus me-2"></i>Registrarse
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 text-center" data-aos="fade-left">
+        <div class="hero-image">
+          <img src="/static/logos/logo.png" class="img-fluid rounded-4 shadow-lg" alt="Logo de la clínica" style="max-height: 300px;">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sección de características -->
+<section class="features-section py-5">
+  <div class="container">
+    <div class="row text-center mb-5">
+      <div class="col-12">
+        <h2 class="display-5 fw-bold mb-3">¿Por qué elegir {{ clinic.nombre|default:'nuestra clínica' }}?</h2>
+        <p class="lead text-muted">Descubre las ventajas de nuestro servicio médico integral</p>
+      </div>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="feature-card text-center p-4 h-100">
+          <div class="feature-icon mb-3">
+            <i class="fas fa-calendar-check fa-3x text-primary"></i>
+          </div>
+          <h4 class="fw-bold mb-3">Gestión de Citas</h4>
+          <p class="text-muted">Sistema inteligente de programación y seguimiento de citas médicas con recordatorios automáticos.</p>
+        </div>
+      </div>
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="feature-card text-center p-4 h-100">
+          <div class="feature-icon mb-3">
+            <i class="fas fa-user-md fa-3x text-primary"></i>
+          </div>
+          <h4 class="fw-bold mb-3">Perfiles Médicos</h4>
+          <p class="text-muted">Gestión completa de perfiles de doctores con especialidades, horarios y disponibilidad.</p>
+        </div>
+      </div>
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+        <div class="feature-card text-center p-4 h-100">
+          <div class="feature-icon mb-3">
+            <i class="fas fa-pills fa-3x text-primary"></i>
+          </div>
+          <h4 class="fw-bold mb-3">Gestión Clínica</h4>
+          <p class="text-muted">Prescripción de medicamentos, solicitud de análisis y seguimiento del tratamiento.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sección de estadísticas -->
+<section class="stats-section py-5 bg-gradient-primary text-white">
+  <div class="container">
+    <div class="row text-center">
+      <div class="col-md-3 mb-4" data-aos="zoom-in" data-aos-delay="100">
+        <div class="stat-item">
+          <h3 class="display-4 fw-bold mb-2">500+</h3>
+          <p class="mb-0 opacity-75">Pacientes Atendidos</p>
+        </div>
+      </div>
+      <div class="col-md-3 mb-4" data-aos="zoom-in" data-aos-delay="200">
+        <div class="stat-item">
+          <h3 class="display-4 fw-bold mb-2">50+</h3>
+          <p class="mb-0 opacity-75">Doctores Registrados</p>
+        </div>
+      </div>
+      <div class="col-md-3 mb-4" data-aos="zoom-in" data-aos-delay="300">
+        <div class="stat-item">
+          <h3 class="display-4 fw-bold mb-2">1000+</h3>
+          <p class="mb-0 opacity-75">Citas Programadas</p>
+        </div>
+      </div>
+      <div class="col-md-3 mb-4" data-aos="zoom-in" data-aos-delay="400">
+        <div class="stat-item">
+          <h3 class="display-4 fw-bold mb-2">99%</h3>
+          <p class="mb-0 opacity-75">Satisfacción</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sección sobre nosotros -->
+<section class="about-section py-5">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6 mb-5 mb-lg-0" data-aos="fade-right">
+        <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&w=800&q=80" 
+             class="img-fluid rounded-4 shadow-lg" alt="Equipo médico">
+      </div>
+      <div class="col-lg-6" data-aos="fade-left">
+        <h2 class="display-5 fw-bold mb-4">Sobre {{ clinic.nombre|default:'Nosotros' }}</h2>
+        <p class="lead mb-4">
+          {{ clinic.nosotros|default:'Somos una plataforma integral de gestión médica diseñada para modernizar y optimizar la atención sanitaria, conectando doctores y pacientes de manera eficiente.' }}
+        </p>
+        <div class="row g-3">
+          <div class="col-6">
+            <div class="d-flex align-items-center mb-3">
+              <i class="fas fa-check-circle text-success me-3 fa-lg"></i>
+              <span class="fw-semibold">Atención Personalizada</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="d-flex align-items-center mb-3">
+              <i class="fas fa-check-circle text-success me-3 fa-lg"></i>
+              <span class="fw-semibold">Tecnología Avanzada</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="d-flex align-items-center mb-3">
+              <i class="fas fa-check-circle text-success me-3 fa-lg"></i>
+              <span class="fw-semibold">Seguridad Garantizada</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="d-flex align-items-center mb-3">
+              <i class="fas fa-check-circle text-success me-3 fa-lg"></i>
+              <span class="fw-semibold">Soporte 24/7</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sección de Misión, Visión y Valores -->
+<section class="values-section py-5 bg-light">
+  <div class="container">
+    <div class="row text-center mb-5">
+      <div class="col-12">
+        <h2 class="display-5 fw-bold mb-3">Nuestra Identidad</h2>
+        <p class="lead text-muted">Conoce los pilares que guían nuestro trabajo</p>
+      </div>
+    </div>
+    <div class="row g-4">
+      <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="value-card text-center p-4 h-100">
+          <div class="value-icon mb-3">
+            <i class="fas fa-bullseye fa-3x text-primary"></i>
+          </div>
+          <h4 class="fw-bold mb-3">Misión</h4>
+          <p class="text-muted">{{ clinic.mision|default:'Nuestra misión es brindar atención médica de calidad, centrada en el paciente y basada en la ética profesional.' }}</p>
+        </div>
+      </div>
+      <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="value-card text-center p-4 h-100">
+          <div class="value-icon mb-3">
+            <i class="fas fa-eye fa-3x text-primary"></i>
+          </div>
+          <h4 class="fw-bold mb-3">Visión</h4>
+          <p class="text-muted">{{ clinic.vision|default:'Ser el consultorio médico de referencia en la región, reconocido por la excelencia y la innovación en el cuidado de la salud.' }}</p>
+        </div>
+      </div>
+      <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
+        <div class="value-card text-center p-4 h-100">
+          <div class="value-icon mb-3">
+            <i class="fas fa-heart fa-3x text-primary"></i>
+          </div>
+          <h4 class="fw-bold mb-3">Valores</h4>
+          <p class="text-muted">{{ clinic.valores|default:'Compromiso, respeto, integridad, empatía y profesionalismo.' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sección de contacto -->
+<section class="contact-section py-5">
+  <div class="container">
+    <div class="row text-center mb-5">
+      <div class="col-12">
+        <h2 class="display-5 fw-bold mb-3">Contáctanos</h2>
+        <p class="lead text-muted">Estamos aquí para ayudarte con cualquier consulta</p>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="contact-card bg-white rounded-4 shadow-lg p-5">
+          <div class="row g-4">
+            <div class="col-md-4 text-center" data-aos="fade-up" data-aos-delay="100">
+              <div class="contact-item">
+                <i class="fas fa-map-marker-alt fa-2x text-primary mb-3"></i>
+                <h5 class="fw-bold mb-2">Dirección</h5>
+                <p class="text-muted mb-0">{{ clinic.direccion|default:'Av. Principal 123<br>Ciudad, País'|safe }}</p>
+              </div>
+            </div>
+            <div class="col-md-4 text-center" data-aos="fade-up" data-aos-delay="200">
+              <div class="contact-item">
+                <i class="fas fa-phone fa-2x text-primary mb-3"></i>
+                <h5 class="fw-bold mb-2">Teléfono</h5>
+                <p class="text-muted mb-0">{{ clinic.telefono|default:'+1 (555) 123-4567<br>+1 (555) 987-6543'|safe }}</p>
+              </div>
+            </div>
+            <div class="col-md-4 text-center" data-aos="fade-up" data-aos-delay="300">
+              <div class="contact-item">
+                <i class="fas fa-envelope fa-2x text-primary mb-3"></i>
+                <h5 class="fw-bold mb-2">Email</h5>
+                <p class="text-muted mb-0">{{ clinic.email|default:'info@clinic.com<br>soporte@clinic.com'|safe }}</p>
+              </div>
+            </div>
+          </div>
+          {% if clinic.horario %}
+          <div class="row mt-4">
+            <div class="col-12 text-center">
+              <div class="contact-item">
+                <i class="fas fa-clock fa-2x text-primary mb-3"></i>
+                <h5 class="fw-bold mb-2">Horario de Atención</h5>
+                <p class="text-muted mb-0">{{ clinic.horario }}</p>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer-section py-4 bg-dark text-white">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <p class="mb-0">&copy; 2025 {{ clinic.nombre|default:'ClínicaFácil' }}. Todos los derechos reservados.</p>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <div class="social-links">
+          <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="text-white me-3"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" class="text-white"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Estilos CSS personalizados -->
+<style>
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.1)" points="0,1000 1000,0 1000,1000"/></svg>');
+  background-size: cover;
+}
+
+.text-gradient {
+  background: linear-gradient(45deg, #fff, #f8f9fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Feature Cards */
+.feature-card {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.feature-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  color: white;
+}
+
+/* Value Cards */
+.value-card {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.value-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.value-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  color: white;
+}
+
+/* Stats Section */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.stat-item {
+  padding: 2rem;
+  border-radius: 1rem;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Contact Card */
+.contact-card {
+  border: none;
+  transition: transform 0.3s ease;
+}
+
+.contact-card:hover {
+  transform: translateY(-5px);
+}
+
+.contact-item {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: rgba(102, 126, 234, 0.05);
+  transition: all 0.3s ease;
+}
+
+.contact-item:hover {
+  background: rgba(102, 126, 234, 0.1);
+  transform: scale(1.05);
+}
+
+/* Social Links */
+.social-links a {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  text-align: center;
+  line-height: 40px;
+  transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+  background: rgba(255,255,255,0.2);
+  transform: translateY(-2px);
+}
+
+/* Animaciones */
+[data-aos] {
+  opacity: 0;
+  transition: all 0.6s ease;
+}
+
+[data-aos].aos-animate {
+  opacity: 1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero-section {
+    min-height: 100vh;
+  }
+  
+  .display-4 {
+    font-size: 2.5rem;
+  }
+  
+  .display-5 {
+    font-size: 2rem;
+  }
+}
+</style>
+
+<!-- Script para animaciones simples -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Animación simple para elementos con data-aos
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('aos-animate');
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('[data-aos]').forEach(el => {
+    observer.observe(el);
+  });
+});
+</script>
+{% endblock %}

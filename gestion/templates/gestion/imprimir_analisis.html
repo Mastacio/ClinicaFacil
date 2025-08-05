@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitud de Análisis - {{ gestion.paciente.user.get_full_name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @media print {
+            body {
+                margin: 0;
+                padding: 20px;
+                font-size: 12px;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            .page-break {
+                page-break-before: always;
+            }
+        }
+        
+        @media screen {
+            body {
+                padding: 20px;
+                background-color: #f8f9fa;
+            }
+            .print-only {
+                display: none;
+            }
+        }
+        
+        .solicitud-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+        }
+        
+        .logo-clinica {
+            max-width: 150px;
+            max-height: 80px;
+        }
+        
+        .firma-sello {
+            position: absolute;
+            bottom: 50px;
+            right: 50px;
+            text-align: center;
+        }
+        
+        .firma-doctor {
+            max-width: 120px;
+            max-height: 60px;
+        }
+        
+        .sello-clinica {
+            max-width: 80px;
+            max-height: 80px;
+            margin-top: 10px;
+        }
+        
+        .analisis-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        
+        .analisis-nombre {
+            font-weight: bold;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .analisis-detalles {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .instrucciones {
+            margin-top: 10px;
+            padding: 8px;
+            background-color: #fff;
+            border-left: 3px solid #17a2b8;
+            font-style: italic;
+        }
+        
+        .info-paciente {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .info-doctor {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .timbrado {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            max-width: 200px;
+            max-height: 100px;
+            opacity: 0.3;
+        }
+        
+        .fecha-solicitud {
+            text-align: right;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        
+        .btn-print {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .preparacion {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Botón de impresión (solo visible en pantalla) -->
+    <div class="no-print">
+        <button class="btn btn-info btn-print" onclick="window.print()">
+            <i class="fas fa-print me-2"></i>Imprimir
+        </button>
+    </div>
+
+    <!-- Timbrado de fondo -->
+    {% if config.archivo_timbrado %}
+    <img src="{{ config.archivo_timbrado.url }}" alt="Timbrado" class="timbrado">
+    {% endif %}
+
+    <div class="container-fluid">
+        <!-- Encabezado de la solicitud -->
+        <div class="solicitud-header">
+            <div class="row align-items-center">
+                <div class="col-3">
+                    {% if config.sello_clinica %}
+                    <img src="{{ config.sello_clinica.url }}" alt="Logo Clínica" class="logo-clinica">
+                    {% endif %}
+                </div>
+                <div class="col-6">
+                    <h3 class="mb-2">{{ config.nombre_clinica|default:'CLÍNICA MÉDICA' }}</h3>
+                    <p class="mb-1">{{ config.direccion_clinica|default:'Dirección de la Clínica' }}</p>
+                    <p class="mb-1">{{ config.telefono_clinica|default:'Teléfono' }} | {{ config.email_clinica|default:'Email' }}</p>
+                    <h4 class="mt-3 mb-0">SOLICITUD DE ANÁLISIS</h4>
+                </div>
+                <div class="col-3">
+                    <div class="fecha-solicitud">
+                        <strong>Fecha:</strong> {{ gestion.fecha_consulta|date:"d/m/Y" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información del paciente -->
+        <div class="info-paciente">
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>PACIENTE:</strong> {{ gestion.paciente.user.get_full_name }}<br>
+                    <strong>EDAD:</strong> {{ gestion.paciente.edad|default:'N/A' }} años<br>
+                    <strong>SEXO:</strong> {{ gestion.paciente.get_sexo_display|default:'N/A' }}
+                </div>
+                <div class="col-md-6">
+                    <strong>DOCUMENTO:</strong> {{ gestion.paciente.documento|default:'N/A' }}<br>
+                    <strong>DIRECCIÓN:</strong> {{ gestion.paciente.direccion|default:'N/A' }}<br>
+                    <strong>TELÉFONO:</strong> {{ gestion.paciente.telefono|default:'N/A' }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Información del doctor -->
+        <div class="info-doctor">
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>MÉDICO:</strong> Dr. {{ gestion.doctor.user.get_full_name }}<br>
+                    <strong>ESPECIALIDAD:</strong> {{ gestion.doctor.especialidad|default:'N/A' }}
+                </div>
+                <div class="col-md-6">
+                    <strong>LICENCIA:</strong> {{ gestion.doctor.numero_licencia|default:'N/A' }}<br>
+                    <strong>CONSULTORIO:</strong> {{ gestion.doctor.consultorio|default:'N/A' }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Diagnóstico -->
+        {% if gestion.diagnostico %}
+        <div class="mb-4">
+            <h5><strong>DIAGNÓSTICO:</strong></h5>
+            <p class="border p-3 bg-light">{{ gestion.diagnostico }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Análisis solicitados -->
+        <div class="mb-4">
+            <h5><strong>ANÁLISIS SOLICITADOS:</strong></h5>
+            {% for analisis in analisis %}
+            <div class="analisis-item">
+                <div class="analisis-nombre">
+                    {{ forloop.counter }}. {{ analisis.analisis.nombre }}
+                    {% if analisis.analisis.tipo %}
+                    ({{ analisis.analisis.tipo }})
+                    {% endif %}
+                </div>
+                <div class="analisis-detalles">
+                    {% if analisis.fecha_programada %}
+                    <strong>Fecha Programada:</strong> {{ analisis.fecha_programada|date:"d/m/Y" }}<br>
+                    {% endif %}
+                    {% if analisis.analisis.descripcion %}
+                    <strong>Descripción:</strong> {{ analisis.analisis.descripcion }}<br>
+                    {% endif %}
+                </div>
+                {% if analisis.instrucciones %}
+                <div class="instrucciones">
+                    <strong>Instrucciones especiales:</strong><br>
+                    {{ analisis.instrucciones }}
+                </div>
+                {% endif %}
+                {% if analisis.analisis.preparacion %}
+                <div class="preparacion">
+                    <strong>Preparación requerida:</strong><br>
+                    {{ analisis.analisis.preparacion }}
+                </div>
+                {% endif %}
+                {% if analisis.observaciones %}
+                <div class="instrucciones">
+                    <strong>Observaciones:</strong><br>
+                    {{ analisis.observaciones }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Observaciones -->
+        {% if gestion.observaciones %}
+        <div class="mb-4">
+            <h5><strong>OBSERVACIONES:</strong></h5>
+            <p class="border p-3 bg-light">{{ gestion.observaciones }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Firma y sello -->
+        <div class="firma-sello">
+            {% if config.firma_doctor %}
+            <img src="{{ config.firma_doctor.url }}" alt="Firma del Doctor" class="firma-doctor"><br>
+            {% endif %}
+            <strong>Dr. {{ gestion.doctor.user.get_full_name }}</strong><br>
+            <small>{{ gestion.doctor.especialidad|default:'Médico' }}</small><br>
+            <small>Lic. {{ gestion.doctor.numero_licencia|default:'N/A' }}</small>
+            {% if config.sello_clinica %}
+            <br><img src="{{ config.sello_clinica.url }}" alt="Sello Clínica" class="sello-clinica">
+            {% endif %}
+        </div>
+
+        <!-- Información adicional -->
+        <div class="mt-5">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6><strong>INSTRUCCIONES PARA EL PACIENTE:</strong></h6>
+                    <ul class="small">
+                        <li>Presentarse con 8 horas de ayuno (si es requerido)</li>
+                        <li>Llevar documento de identidad</li>
+                        <li>Llegar 15 minutos antes de la hora programada</li>
+                        <li>Traer esta solicitud impresa</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6><strong>HORARIO DE ATENCIÓN:</strong></h6>
+                    <p class="small mb-1">Lunes a Viernes: 7:00 AM - 5:00 PM</p>
+                    <p class="small mb-1">Sábados: 7:00 AM - 12:00 PM</p>
+                    <p class="small">Domingos: Cerrado</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-print cuando se carga la página
+        window.onload = function() {
+            // Pequeño delay para asegurar que todo esté cargado
+            setTimeout(function() {
+                window.print();
+            }, 500);
+        };
+    </script>
+</body>
+</html> 
