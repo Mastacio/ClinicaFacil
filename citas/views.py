@@ -79,22 +79,16 @@ def calendario_doctor(request):
         inicio_mes = hoy.replace(day=1)
         fin_mes = (inicio_mes.replace(day=28) + timedelta(days=4)).replace(day=1) - timedelta(days=1)
         
-        print(f"DEBUG: Buscando citas para doctor {doctor.id} desde {inicio_mes} hasta {fin_mes}")
-        
         citas = Cita.objects.filter(
             doctor=doctor, 
             fecha__gte=inicio_mes,
-            fecha__lte=fin_mes
-        ).select_related('paciente')
-        
-        print(f"DEBUG: Encontradas {citas.count()} citas")
+            fecha__lte=fin_mes,
+        ).exclude(estado='cancelada').select_related('paciente')
         
         for cita in citas:
             fecha_str = cita.fecha.strftime('%Y-%m-%d')
             hora_inicio = cita.hora_inicio.strftime('%H:%M')
             hora_fin = cita.hora_fin.strftime('%H:%M')
-            
-            print(f"DEBUG: Procesando cita - Fecha: {fecha_str}, Hora: {hora_inicio}-{hora_fin}, Paciente: {cita.paciente}")
             
             if fecha_str not in citas_detalladas:
                 citas_detalladas[fecha_str] = {}
@@ -108,8 +102,6 @@ def calendario_doctor(request):
                 'motivo': cita.motivo
             }
     
-    print(f"DEBUG: Citas detalladas: {citas_detalladas}")
-    
     # Construir slots detallados por fecha específica
     slots_detallados = {}
     
@@ -117,9 +109,6 @@ def calendario_doctor(request):
     hoy = datetime.today().date()
     inicio_mes = hoy.replace(day=1)
     fin_mes = (inicio_mes.replace(day=28) + timedelta(days=4)).replace(day=1) - timedelta(days=1)
-    
-    print(f"DEBUG: Generando slots desde {inicio_mes} hasta {fin_mes}")
-    print(f"DEBUG: Horarios disponibles: {[f'{h.dia_semana}: {h.hora_inicio}-{h.hora_fin}' for h in horarios]}")
     
     fecha_actual = inicio_mes
     while fecha_actual <= fin_mes:
@@ -131,7 +120,6 @@ def calendario_doctor(request):
         
         if horarios_dia:
             slots_detallados[fecha_str] = {}
-            print(f"DEBUG: Generando slots para {fecha_str} (día {dia_semana})")
             
             for horario in horarios_dia:
                 t = horario.hora_inicio
@@ -162,10 +150,6 @@ def calendario_doctor(request):
                     t = hora_fin_slot
         
         fecha_actual += timedelta(days=1)
-    
-    print(f"DEBUG: Slots detallados generados: {len(slots_detallados)} fechas")
-    for fecha, slots in list(slots_detallados.items())[:3]:  # Mostrar solo las primeras 3 fechas
-        print(f"DEBUG: {fecha}: {len(slots)} slots")
     
     # Construir intervalos_por_dia para compatibilidad (mantener estructura anterior)
     intervalos_por_dia = {i: [] for i in dias_idx}
@@ -414,15 +398,11 @@ def agenda_doctor(request):
     """
     Vista para la agenda de citas del doctor
     """
-    print(f"DEBUG: Usuario: {request.user.username}, Rol: {request.user.role}")
-    
     # Obtener parámetros de filtro
     fecha_filtro = request.GET.get('fecha')
     estado_filtro = request.GET.get('estado')
     paciente_filtro = request.GET.get('paciente')
     doctor_filtro = request.GET.get('doctor')
-    
-    print(f"DEBUG: Filtros - fecha: {fecha_filtro}, estado: {estado_filtro}, paciente: {paciente_filtro}, doctor: {doctor_filtro}")
     
     # Determinar qué doctor mostrar
     doctor = None
@@ -432,21 +412,18 @@ def agenda_doctor(request):
         # Admin puede ver agenda de cualquier doctor
         if doctor_filtro:
             doctor = DoctorPerfil.objects.filter(id=doctor_filtro, activo=True).first()
-            print(f"DEBUG: Admin seleccionó doctor ID {doctor_filtro}, encontrado: {doctor}")
             if not doctor:
                 messages.error(request, 'Doctor no encontrado.')
                 return redirect('agenda_doctor')
         else:
             # Si no seleccionó doctor, usar el primero disponible
             doctor = DoctorPerfil.objects.filter(activo=True).first()
-            print(f"DEBUG: Admin sin selección, usando primer doctor: {doctor}")
             if not doctor:
                 messages.error(request, 'No hay doctores disponibles.')
                 return redirect('gestionar_citas')
     else:
         # Doctor ve solo su propia agenda
         doctor = DoctorPerfil.objects.filter(user=request.user, activo=True).first()
-        print(f"DEBUG: Buscando doctor para usuario {request.user.username}, encontrado: {doctor}")
         if not doctor:
             messages.error(request, 'No tienes un perfil de doctor configurado.')
             return redirect('gestionar_citas')
@@ -455,34 +432,27 @@ def agenda_doctor(request):
     doctores_disponibles = []
     if es_admin:
         doctores_disponibles = DoctorPerfil.objects.filter(activo=True).select_related('user')
-        print(f"DEBUG: Doctores disponibles para admin: {doctores_disponibles.count()}")
     
     # Filtrar citas del doctor
     citas = Cita.objects.filter(doctor=doctor).select_related('paciente__user')
-    print(f"DEBUG: Citas encontradas para doctor {doctor}: {citas.count()}")
     
     # Aplicar filtros
     if fecha_filtro:
         try:
             fecha_obj = datetime.strptime(fecha_filtro, '%Y-%m-%d').date()
             citas = citas.filter(fecha=fecha_obj)
-            print(f"DEBUG: Filtro por fecha {fecha_obj}, citas restantes: {citas.count()}")
         except ValueError:
-            print(f"DEBUG: Error al parsear fecha {fecha_filtro}")
             pass
     else:
         # Por defecto, mostrar citas del día actual
         citas = citas.filter(fecha=datetime.today().date())
-        print(f"DEBUG: Mostrando citas del día actual, encontradas: {citas.count()}")
     
     if estado_filtro:
         citas = citas.filter(estado=estado_filtro)
-        print(f"DEBUG: Filtro por estado {estado_filtro}, citas restantes: {citas.count()}")
     
     if paciente_filtro:
         citas = citas.filter(paciente__user__first_name__icontains=paciente_filtro) | \
                 citas.filter(paciente__user__last_name__icontains=paciente_filtro)
-        print(f"DEBUG: Filtro por paciente {paciente_filtro}, citas restantes: {citas.count()}")
     
     # Ordenar por fecha y hora
     citas = citas.order_by('fecha', 'hora_inicio')
@@ -493,8 +463,6 @@ def agenda_doctor(request):
     citas_confirmadas = citas.filter(estado='confirmada').count()
     citas_completadas = citas.filter(estado='completada').count()
     citas_canceladas = citas.filter(estado='cancelada').count()
-    
-    print(f"DEBUG: Estadísticas - Total: {total_citas}, Pendientes: {citas_pendientes}, Confirmadas: {citas_confirmadas}")
     
     context = {
         'citas': citas,
@@ -513,7 +481,6 @@ def agenda_doctor(request):
         'es_admin': es_admin,
     }
     
-    print(f"DEBUG: Contexto preparado, renderizando template")
     return render(request, 'citas/agenda_doctor.html', context)
 
 @doctor_required

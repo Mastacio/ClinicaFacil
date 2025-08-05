@@ -35,11 +35,6 @@ def construir_url_con_filtros(base_url, request):
     if params:
         base_url += '?' + '&'.join(params)
     
-    print(f"DEBUG - URL construida: {base_url}")
-    print(f"DEBUG - Parámetros: {params}")
-    print(f"DEBUG - GET: {dict(request.GET)}")
-    print(f"DEBUG - POST: {dict(request.POST)}")
-    
     return base_url
 
 @role_required(['admin', 'doctor'])
@@ -47,9 +42,6 @@ def gestionar_cita(request, cita_id):
     """
     Vista para gestionar una cita específica
     """
-    print(f"DEBUG - Parámetros recibidos: {request.GET}")
-    print(f"DEBUG - URL completa: {request.get_full_path()}")
-    
     cita = get_object_or_404(Cita, pk=cita_id)
     
     # Verificar permisos
