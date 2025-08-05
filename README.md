@@ -12,14 +12,11 @@
 ### 🏠 Página Principal
 ![Página Principal](static/Capturas/1.png)
 
-### 👥 Gestión de Pacientes
+### 👥 Login
 ![Gestión de Pacientes](static/Capturas/2.png)
 
-### 🏥 Gestión de Doctores
+### 🏥 Pagina de inicio
 ![Gestión de Doctores](static/Capturas/3.png)
-
-### 📅 Sistema de Citas
-![Sistema de Citas](static/Capturas/4.png)
 
 ## ✨ Características Principales
 
