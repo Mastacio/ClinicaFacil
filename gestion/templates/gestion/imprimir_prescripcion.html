@@ -186,7 +186,14 @@
             <div class="row">
                 <div class="col-md-6">
                     <strong>MÉDICO:</strong> Dr. {{ gestion.doctor.user.get_full_name }}<br>
-                    <strong>ESPECIALIDAD:</strong> {{ gestion.doctor.especialidad|default:'N/A' }}
+                    <strong>ESPECIALIDAD:</strong> 
+                    {% if gestion.doctor.especialidades.exists %}
+                      {% for especialidad in gestion.doctor.especialidades.all %}
+                        {{ especialidad.nombre }}{% if not forloop.last %}, {% endif %}
+                      {% endfor %}
+                    {% else %}
+                      N/A
+                    {% endif %}
                 </div>
                 <div class="col-md-6">
                     <strong>LICENCIA:</strong> {{ gestion.doctor.numero_licencia|default:'N/A' }}<br>
@@ -251,7 +258,15 @@
             <img src="{{ config.firma_doctor.url }}" alt="Firma del Doctor" class="firma-doctor"><br>
             {% endif %}
             <strong>Dr. {{ gestion.doctor.user.get_full_name }}</strong><br>
-            <small>{{ gestion.doctor.especialidad|default:'Médico' }}</small><br>
+            <small>
+              {% if gestion.doctor.especialidades.exists %}
+                {% for especialidad in gestion.doctor.especialidades.all %}
+                  {{ especialidad.nombre }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+              {% else %}
+                Médico
+              {% endif %}
+            </small><br>
             <small>Lic. {{ gestion.doctor.numero_licencia|default:'N/A' }}</small>
             {% if config.sello_clinica %}
             <br><img src="{{ config.sello_clinica.url }}" alt="Sello Clínica" class="sello-clinica">

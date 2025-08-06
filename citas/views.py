@@ -381,7 +381,11 @@ def crear_cita_modal(request):
 
 @cita_owner_required
 def ver_cita(request, pk):
-    cita = get_object_or_404(Cita, pk=pk)
+    cita = get_object_or_404(
+        Cita.objects.select_related('doctor__user', 'paciente__user')
+                   .prefetch_related('doctor__especialidades'), 
+        pk=pk
+    )
     return render(request, 'citas/ver_cita.html', {'cita': cita})
 
 @staff_required
@@ -607,7 +611,7 @@ def mis_citas(request):
         return redirect('welcome')
     
     # Obtener citas del paciente
-    citas = Cita.objects.filter(paciente=paciente).select_related('doctor__user').order_by('-fecha', 'hora_inicio')
+    citas = Cita.objects.filter(paciente=paciente).select_related('doctor__user').prefetch_related('doctor__especialidades').order_by('-fecha', 'hora_inicio')
     
     # Aplicar filtros
     estado_filtro = request.GET.get('estado')

@@ -43,8 +43,16 @@
               <dl class="row">
                 <dt class="col-sm-4">Nombre</dt>
                 <dd class="col-sm-8">{{ cita.doctor.user.get_full_name }}</dd>
-                <dt class="col-sm-4">Especialidad</dt>
-                <dd class="col-sm-8">{{ cita.doctor.especialidad }}</dd>
+                <dt class="col-sm-4">Especialidad{{ cita.doctor.especialidades.count|pluralize:"es" }}</dt>
+                <dd class="col-sm-8">
+                  {% if cita.doctor.especialidades.exists %}
+                    {% for especialidad in cita.doctor.especialidades.all %}
+                      <span class="badge bg-primary me-1">{{ especialidad.nombre }}</span>
+                    {% endfor %}
+                  {% else %}
+                    <span class="text-muted">No especificadas</span>
+                  {% endif %}
+                </dd>
                 <dt class="col-sm-4">Email</dt>
                 <dd class="col-sm-8">{{ cita.doctor.user.email }}</dd>
               </dl>

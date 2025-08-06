@@ -279,7 +279,11 @@ def imprimir_prescripcion(request, gestion_id):
     """
     Vista para imprimir prescripción de medicamentos
     """
-    gestion = get_object_or_404(GestionCita, pk=gestion_id)
+    gestion = get_object_or_404(
+        GestionCita.objects.select_related('doctor__user', 'cita__paciente__user')
+                          .prefetch_related('doctor__especialidades'), 
+        pk=gestion_id
+    )
     
     # Verificar permisos
     if request.user.role == 'admin':
@@ -328,7 +332,11 @@ def imprimir_analisis(request, gestion_id):
     """
     Vista para imprimir solicitud de análisis
     """
-    gestion = get_object_or_404(GestionCita, pk=gestion_id)
+    gestion = get_object_or_404(
+        GestionCita.objects.select_related('doctor__user', 'cita__paciente__user')
+                          .prefetch_related('doctor__especialidades'), 
+        pk=gestion_id
+    )
     
     # Verificar permisos
     if request.user.role == 'admin':

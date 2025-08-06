@@ -167,7 +167,15 @@
                             <td>
                                 <strong>{{ cita.doctor.user.get_full_name }}</strong>
                                 <br>
-                                <small class="text-muted">{{ cita.doctor.especialidad }}</small>
+                                <small class="text-muted">
+                                  {% if cita.doctor.especialidades.exists %}
+                                    {% for especialidad in cita.doctor.especialidades.all %}
+                                      {{ especialidad.nombre }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                  {% else %}
+                                    Especialidad no especificada
+                                  {% endif %}
+                                </small>
                             </td>
                             <td>
                                 <span class="text-truncate d-inline-block" style="max-width: 200px;" title="{{ cita.motivo }}">
