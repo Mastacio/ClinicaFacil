@@ -317,7 +317,7 @@
                     
                     // Cargar formulario después de un delay más largo
                     setTimeout(() => {
-                        const url = `/citas/crear/modal/?doctor={{ doctor.pk }}&fecha=${fecha}&hora_inicio=${hora}`;
+                        const url = `/citas/crear-modal/?doctor={{ doctor.pk }}&fecha=${fecha}&hora_inicio=${hora}`;
                         
                         fetch(url, {
                             headers: {
