@@ -104,6 +104,21 @@ class PacientePerfilForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Describe los antecedentes familiares relevantes...'
             }),
+            'seguro_medico': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nombre de la compañía de seguros'
+            }),
+            'numero_seguro': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Número de póliza o carnet'
+            }),
+            'ocupacion': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Profesión u ocupación actual'
+            }),
+            'estado_civil': forms.Select(attrs={
+                'class': 'form-control'
+            }),
             'notas': forms.Textarea(attrs={
                 'rows': 2, 
                 'class': 'form-control',

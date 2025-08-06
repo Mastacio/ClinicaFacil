@@ -10,8 +10,15 @@ from users.decorators import (
 # Vista para ver paciente
 @role_required(['admin', 'doctor'])
 def ver_paciente(request, pk):
+    from datetime import date
     paciente = get_object_or_404(PacientePerfil, pk=pk)
-    return render(request, 'pacientes/ver_paciente.html', {'paciente': paciente})
+    edad = None
+    if paciente.fecha_nacimiento:
+        today = date.today()
+        edad = today.year - paciente.fecha_nacimiento.year - (
+            (today.month, today.day) < (paciente.fecha_nacimiento.month, paciente.fecha_nacimiento.day)
+        )
+    return render(request, 'pacientes/ver_paciente.html', {'paciente': paciente, 'edad': edad})
 
 # Vista para editar paciente
 @role_required(['admin', 'doctor'])

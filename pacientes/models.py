@@ -21,7 +21,14 @@ class PacientePerfil(models.Model):
     seguro_medico = models.CharField(max_length=100, blank=True)
     numero_seguro = models.CharField(max_length=100, blank=True)
     ocupacion = models.CharField(max_length=100, blank=True)
-    estado_civil = models.CharField(max_length=20, blank=True)
+    estado_civil = models.CharField(max_length=20, choices=[
+        ('soltero', 'Soltero/a'),
+        ('casado', 'Casado/a'),
+        ('divorciado', 'Divorciado/a'),
+        ('viudo', 'Viudo/a'),
+        ('union_libre', 'Unión libre'),
+        ('separado', 'Separado/a')
+    ], blank=True)
     notas = models.TextField(blank=True)
     completado = models.BooleanField(default=False)
 

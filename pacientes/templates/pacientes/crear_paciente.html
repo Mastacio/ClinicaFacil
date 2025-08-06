@@ -237,6 +237,47 @@
               {% endfor %}
             </div>
 
+            <!-- Información Adicional -->
+            <div class="row g-4 mb-4">
+              <div class="col-12">
+                <h5 class="text-purple border-bottom pb-2 mb-3" style="color: #6f42c1;">
+                  <i class="fas fa-user-circle me-2"></i>Información Adicional
+                </h5>
+              </div>
+              {% for field in perfil_form %}
+                {% if field.name == 'ocupacion' or field.name == 'estado_civil' or field.name == 'seguro_medico' or field.name == 'numero_seguro' %}
+                <div class="col-12 col-md-6">
+                  <div class="mb-3">
+                    <label for="id_{{ field.name }}" class="form-label fw-semibold">
+                      {% if field.name == 'ocupacion' %}
+                        <i class="fas fa-briefcase me-2" style="color: #6f42c1;"></i>
+                      {% elif field.name == 'estado_civil' %}
+                        <i class="fas fa-heart me-2" style="color: #6f42c1;"></i>
+                      {% elif field.name == 'seguro_medico' %}
+                        <i class="fas fa-shield-alt me-2" style="color: #6f42c1;"></i>
+                      {% elif field.name == 'numero_seguro' %}
+                        <i class="fas fa-hashtag me-2" style="color: #6f42c1;"></i>
+                      {% endif %}
+                      {{ field.label }}
+                      {% if field.field.required %}
+                        <span class="text-danger">*</span>
+                      {% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.errors %}
+                      <div class="text-danger small mt-1">
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ field.errors|striptags }}
+                      </div>
+                    {% endif %}
+                    {% if field.help_text %}
+                      <div class="form-text text-muted">{{ field.help_text }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+
             <!-- Notas Adicionales -->
             <div class="row g-4 mb-4">
               <div class="col-12">
