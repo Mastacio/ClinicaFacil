@@ -1,5 +1,6 @@
 from django import forms
-from .models import HorarioDoctor
+from users.models import User
+from .models import DoctorPerfil, Especialidad, HorarioDoctor
 
 class HorarioDoctorForm(forms.ModelForm):
     class Meta:
@@ -11,9 +12,6 @@ class HorarioDoctorForm(forms.ModelForm):
             'hora_fin': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
             'intervalo_minutos': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 180, 'step': 1}),
         }
-from django import forms
-from users.models import User
-from .models import DoctorPerfil, Especialidad
 
 class CrearDoctorForm(forms.ModelForm):
     email = forms.EmailField(label='Correo electrónico', widget=forms.EmailInput(attrs={'class': 'form-control'}))

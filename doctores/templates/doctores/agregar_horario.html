@@ -1,31 +1,109 @@
 {% extends 'users/panel_base.html' %}
 {% block panel_content %}
-<div class="container py-4">
+<div class="container py-5">
   <div class="row justify-content-center">
-    <div class="col-md-8">
-      <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-          <h4 class="mb-0">Agregar Horario a {{ doctor.user.get_full_name|default:doctor.user.username }}</h4>
+    <div class="col-12 col-lg-8 col-xl-6">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white text-center">
+          <h4 class="mb-0">
+            <i class="fas fa-clock me-2"></i>Agregar Horario
+          </h4>
+          <small class="text-light">
+            <i class="fas fa-user-md me-1"></i>{{ doctor.user.get_full_name|default:doctor.user.username }}
+          </small>
         </div>
-        <div class="card-body">
+        <div class="card-body p-4">
           <form method="post" novalidate>
             {% csrf_token %}
-            {% for field in form %}
-              <div class="row align-items-center mb-2">
-                <div class="col-4 text-end">
-                  <label for="id_{{ field.name }}" class="form-label mb-0">{{ field.label }}</label>
-                </div>
-                <div class="col-8">
-                  {{ field }}
-                  {% if field.errors %}
-                    <div class="text-danger small">{{ field.errors|striptags }}</div>
+            
+            <!-- Configuración del horario -->
+            <div class="row g-4 mb-4">
+              <div class="col-12">
+                <h5 class="text-primary border-bottom pb-2 mb-3">
+                  <i class="fas fa-clock me-2"></i>Configuración del Horario
+                </h5>
+              </div>
+              
+              <div class="col-12 col-md-6">
+                <div class="mb-3">
+                  <label for="id_{{ form.dia_semana.name }}" class="form-label fw-semibold">
+                    <i class="fas fa-calendar-day me-2 text-primary"></i>{{ form.dia_semana.label }}
+                    <span class="text-danger">*</span>
+                  </label>
+                  {{ form.dia_semana }}
+                  {% if form.dia_semana.errors %}
+                    <div class="text-danger small mt-1">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ form.dia_semana.errors|striptags }}
+                    </div>
+                  {% endif %}
+                  {% if form.dia_semana.help_text %}
+                    <div class="form-text text-muted">{{ form.dia_semana.help_text }}</div>
                   {% endif %}
                 </div>
               </div>
-            {% endfor %}
-            <div class="d-flex justify-content-between mt-3">
-              <a href="/doctores/{{ doctor.pk }}/ver/" class="btn btn-outline-secondary">Cancelar</a>
-              <button type="submit" class="btn btn-success">Agregar Horario</button>
+
+              <div class="col-12 col-md-6">
+                <div class="mb-3">
+                  <label for="id_{{ form.intervalo_minutos.name }}" class="form-label fw-semibold">
+                    <i class="fas fa-stopwatch me-2 text-primary"></i>{{ form.intervalo_minutos.label }}
+                    <span class="text-danger">*</span>
+                  </label>
+                  {{ form.intervalo_minutos }}
+                  {% if form.intervalo_minutos.errors %}
+                    <div class="text-danger small mt-1">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ form.intervalo_minutos.errors|striptags }}
+                    </div>
+                  {% endif %}
+                  {% if form.intervalo_minutos.help_text %}
+                    <div class="form-text text-muted">{{ form.intervalo_minutos.help_text }}</div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <div class="mb-3">
+                  <label for="id_{{ form.hora_inicio.name }}" class="form-label fw-semibold">
+                    <i class="fas fa-sun me-2 text-success"></i>{{ form.hora_inicio.label }}
+                    <span class="text-danger">*</span>
+                  </label>
+                  {{ form.hora_inicio }}
+                  {% if form.hora_inicio.errors %}
+                    <div class="text-danger small mt-1">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ form.hora_inicio.errors|striptags }}
+                    </div>
+                  {% endif %}
+                  {% if form.hora_inicio.help_text %}
+                    <div class="form-text text-muted">{{ form.hora_inicio.help_text }}</div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <div class="mb-3">
+                  <label for="id_{{ form.hora_fin.name }}" class="form-label fw-semibold">
+                    <i class="fas fa-moon me-2 text-success"></i>{{ form.hora_fin.label }}
+                    <span class="text-danger">*</span>
+                  </label>
+                  {{ form.hora_fin }}
+                  {% if form.hora_fin.errors %}
+                    <div class="text-danger small mt-1">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ form.hora_fin.errors|striptags }}
+                    </div>
+                  {% endif %}
+                  {% if form.hora_fin.help_text %}
+                    <div class="form-text text-muted">{{ form.hora_fin.help_text }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mt-4">
+              <a href="/doctores/{{ doctor.pk }}/ver/" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Cancelar
+              </a>
+              <button type="submit" class="btn btn-success">
+                <i class="fas fa-save me-2"></i>Agregar Horario
+              </button>
             </div>
           </form>
         </div>
@@ -33,4 +111,22 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Select2 CSS y JS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+  // Inicializar Select2 para el campo de día de la semana
+  $('#id_dia_semana').select2({
+    theme: 'bootstrap-5',
+    width: '100%',
+    placeholder: 'Seleccionar día...',
+    allowClear: true
+  });
+});
+</script>
 {% endblock %}

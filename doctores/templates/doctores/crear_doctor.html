@@ -2,35 +2,135 @@
 {% block panel_content %}
 <div class="container py-5">
   <div class="row justify-content-center">
-    <div class="col-md-10 col-lg-8">
-      <div class="card shadow p-4">
-        <h2 class="mb-4 text-center">Registrar nuevo doctor</h2>
-        <form method="post" novalidate>
-          {% csrf_token %}
-          <div class="row g-3">
-            {% for field in form %}
-              {% if field.name != 'username' %}
-              <div class="row align-items-center mb-2">
-                <div class="col-4 text-end">
-                  <label for="id_{{ field.name }}" class="form-label mb-0">{{ field.label }}</label>
-                </div>
-                <div class="col-8">
-                  {{ field }}
-                  {% if field.errors %}
-                    <div class="text-danger small">{{ field.errors|striptags }}</div>
-                  {% endif %}
-                </div>
+    <div class="col-12 col-lg-10 col-xl-8">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white text-center">
+          <h2 class="mb-0"><i class="fas fa-user-md me-2"></i>Registrar nuevo doctor</h2>
+        </div>
+        <div class="card-body p-4">
+          <form method="post" novalidate>
+            {% csrf_token %}
+            
+            <!-- Datos personales -->
+            <div class="row g-4 mb-4">
+              <div class="col-12">
+                <h5 class="text-primary border-bottom pb-2 mb-3">
+                  <i class="fas fa-user me-2"></i>Datos Personales
+                </h5>
               </div>
-              {% endif %}
-            {% endfor %}
-          </div>
-          <div class="d-flex justify-content-between mt-3">
-            <a href="/doctores/gestionar/" class="btn btn-outline-secondary">Cancelar</a>
-            <button type="submit" class="btn btn-success">Registrar Doctor</button>
-          </div>
-        </form>
+              {% for field in form %}
+                {% if field.name in 'email,first_name,last_name,identificacion' %}
+                <div class="col-12 col-md-6">
+                  <div class="mb-3">
+                    <label for="id_{{ field.name }}" class="form-label fw-semibold">
+                      {% if field.name == 'email' %}
+                        <i class="fas fa-envelope me-2 text-primary"></i>
+                      {% elif field.name == 'first_name' %}
+                        <i class="fas fa-user-tag me-2 text-primary"></i>
+                      {% elif field.name == 'last_name' %}
+                        <i class="fas fa-user-tag me-2 text-primary"></i>
+                      {% elif field.name == 'identificacion' %}
+                        <i class="fas fa-id-card me-2 text-primary"></i>
+                      {% else %}
+                        <i class="fas fa-edit me-2 text-primary"></i>
+                      {% endif %}
+                      {{ field.label }}
+                      {% if field.field.required %}
+                        <span class="text-danger">*</span>
+                      {% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.errors %}
+                      <div class="text-danger small mt-1">
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ field.errors|striptags }}
+                      </div>
+                    {% endif %}
+                    {% if field.help_text %}
+                      <div class="form-text text-muted">{{ field.help_text }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+
+            <!-- Información profesional -->
+            <div class="row g-4 mb-4">
+              <div class="col-12">
+                <h5 class="text-success border-bottom pb-2 mb-3">
+                  <i class="fas fa-stethoscope me-2"></i>Información Profesional
+                </h5>
+              </div>
+              {% for field in form %}
+                {% if field.name not in 'email,first_name,last_name,identificacion' %}
+                <div class="col-12 {% if field.name == 'especialidades' %}col-md-12{% else %}col-md-6{% endif %}">
+                  <div class="mb-3">
+                    <label for="id_{{ field.name }}" class="form-label fw-semibold">
+                      {% if field.name == 'telefono' %}
+                        <i class="fas fa-phone me-2 text-success"></i>
+                      {% elif field.name == 'direccion' %}
+                        <i class="fas fa-map-marker-alt me-2 text-success"></i>
+                      {% elif field.name == 'registro_medico' %}
+                        <i class="fas fa-certificate me-2 text-success"></i>
+                      {% elif field.name == 'universidad' %}
+                        <i class="fas fa-graduation-cap me-2 text-success"></i>
+                      {% elif field.name == 'anios_experiencia' %}
+                        <i class="fas fa-clock me-2 text-success"></i>
+                      {% elif field.name == 'especialidades' %}
+                        <i class="fas fa-tags me-2 text-success"></i>
+                      {% else %}
+                        <i class="fas fa-edit me-2 text-success"></i>
+                      {% endif %}
+                      {{ field.label }}
+                      {% if field.field.required %}
+                        <span class="text-danger">*</span>
+                      {% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.errors %}
+                      <div class="text-danger small mt-1">
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ field.errors|striptags }}
+                      </div>
+                    {% endif %}
+                    {% if field.help_text %}
+                      <div class="form-text text-muted">{{ field.help_text }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+
+            <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mt-4">
+              <a href="/doctores/gestionar/" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Cancelar
+              </a>
+              <button type="submit" class="btn btn-success">
+                <i class="fas fa-save me-2"></i>Registrar Doctor
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Select2 CSS y JS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+  // Inicializar Select2 para campos select
+  $('select.form-control, select.form-select').select2({
+    theme: 'bootstrap-5',
+    width: '100%',
+    placeholder: 'Seleccionar...',
+    allowClear: true
+  });
+});
+</script>
 {% endblock %}

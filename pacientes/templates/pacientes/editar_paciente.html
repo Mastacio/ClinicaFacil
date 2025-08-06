@@ -2,30 +2,214 @@
 {% block panel_content %}
 <div class="container py-4">
   <div class="row justify-content-center">
-    <div class="col-md-8">
-      <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-          <h4 class="mb-0">Editar Paciente</h4>
+    <div class="col-12 col-lg-10">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white text-center">
+          <h4 class="mb-0">
+            <i class="fas fa-user-edit me-2"></i>Editar Información del Paciente
+          </h4>
         </div>
-        <div class="card-body">
+        <div class="card-body p-4">
           <form method="post" novalidate>
             {% csrf_token %}
-            {% for field in form %}
-              <div class="row align-items-center mb-2">
-                <div class="col-4 text-end">
-                  <label for="id_{{ field.name }}" class="form-label mb-0">{{ field.label }}</label>
-                </div>
-                <div class="col-8">
-                  {{ field }}
-                  {% if field.errors %}
-                    <div class="text-danger small">{{ field.errors|striptags }}</div>
-                  {% endif %}
-                </div>
+            
+            <!-- Información Personal -->
+            <div class="row g-4 mb-4">
+              <div class="col-12">
+                <h5 class="text-info border-bottom pb-2 mb-3">
+                  <i class="fas fa-id-card me-2"></i>Información Personal
+                </h5>
               </div>
-            {% endfor %}
-            <div class="d-flex justify-content-between mt-3">
-              <a href="/pacientes/gestionar/" class="btn btn-outline-secondary">Cancelar</a>
-              <button type="submit" class="btn btn-success">Guardar Cambios</button>
+              {% for field in form %}
+                {% if field.name == 'identificacion' or field.name == 'fecha_nacimiento' or field.name == 'sexo' or field.name == 'tipo_sangre' %}
+                <div class="col-12 col-md-{% if field.name == 'identificacion' %}6{% else %}4{% endif %}">
+                  <div class="mb-3">
+                    <label for="id_{{ field.name }}" class="form-label fw-semibold">
+                      {% if field.name == 'identificacion' %}
+                        <i class="fas fa-id-card-alt me-2 text-info"></i>
+                      {% elif field.name == 'fecha_nacimiento' %}
+                        <i class="fas fa-birthday-cake me-2 text-info"></i>
+                      {% elif field.name == 'sexo' %}
+                        <i class="fas fa-venus-mars me-2 text-info"></i>
+                      {% elif field.name == 'tipo_sangre' %}
+                        <i class="fas fa-tint me-2 text-info"></i>
+                      {% endif %}
+                      {{ field.label }}
+                      {% if field.field.required %}
+                        <span class="text-danger">*</span>
+                      {% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.errors %}
+                      <div class="text-danger small mt-1">
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ field.errors|striptags }}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+
+            <!-- Información de Contacto -->
+            <div class="row g-4 mb-4">
+              <div class="col-12">
+                <h5 class="text-warning border-bottom pb-2 mb-3">
+                  <i class="fas fa-address-book me-2"></i>Información de Contacto
+                </h5>
+              </div>
+              {% for field in form %}
+                {% if field.name == 'telefono' or field.name == 'direccion' or field.name == 'ciudad' or field.name == 'pais' %}
+                <div class="col-12 col-md-6">
+                  <div class="mb-3">
+                    <label for="id_{{ field.name }}" class="form-label fw-semibold">
+                      {% if field.name == 'telefono' %}
+                        <i class="fas fa-phone me-2 text-warning"></i>
+                      {% elif field.name == 'direccion' %}
+                        <i class="fas fa-map-marker-alt me-2 text-warning"></i>
+                      {% elif field.name == 'ciudad' %}
+                        <i class="fas fa-city me-2 text-warning"></i>
+                      {% elif field.name == 'pais' %}
+                        <i class="fas fa-globe me-2 text-warning"></i>
+                      {% endif %}
+                      {{ field.label }}
+                      {% if field.field.required %}
+                        <span class="text-danger">*</span>
+                      {% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.errors %}
+                      <div class="text-danger small mt-1">
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ field.errors|striptags }}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+
+            <!-- Contacto de Emergencia -->
+            <div class="row g-4 mb-4">
+              <div class="col-12">
+                <h5 class="text-danger border-bottom pb-2 mb-3">
+                  <i class="fas fa-ambulance me-2"></i>Contacto de Emergencia
+                </h5>
+              </div>
+              {% for field in form %}
+                {% if field.name == 'contacto_emergencia' or field.name == 'telefono_emergencia' %}
+                <div class="col-12 col-md-6">
+                  <div class="mb-3">
+                    <label for="id_{{ field.name }}" class="form-label fw-semibold">
+                      {% if field.name == 'contacto_emergencia' %}
+                        <i class="fas fa-user-friends me-2 text-danger"></i>
+                      {% elif field.name == 'telefono_emergencia' %}
+                        <i class="fas fa-phone-alt me-2 text-danger"></i>
+                      {% endif %}
+                      {{ field.label }}
+                      {% if field.field.required %}
+                        <span class="text-danger">*</span>
+                      {% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.errors %}
+                      <div class="text-danger small mt-1">
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ field.errors|striptags }}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+
+            <!-- Historial Médico -->
+            <div class="row g-4 mb-4">
+              <div class="col-12">
+                <h5 class="text-success border-bottom pb-2 mb-3">
+                  <i class="fas fa-heartbeat me-2"></i>Historial Médico
+                </h5>
+              </div>
+              {% for field in form %}
+                {% if field.name == 'alergias' or field.name == 'enfermedades_cronicas' or field.name == 'medicamentos' %}
+                <div class="col-12 col-md-4">
+                  <div class="mb-3">
+                    <label for="id_{{ field.name }}" class="form-label fw-semibold">
+                      {% if field.name == 'alergias' %}
+                        <i class="fas fa-exclamation-triangle me-2 text-success"></i>
+                      {% elif field.name == 'enfermedades_cronicas' %}
+                        <i class="fas fa-notes-medical me-2 text-success"></i>
+                      {% elif field.name == 'medicamentos' %}
+                        <i class="fas fa-pills me-2 text-success"></i>
+                      {% endif %}
+                      {{ field.label }}
+                      {% if field.field.required %}
+                        <span class="text-danger">*</span>
+                      {% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.errors %}
+                      <div class="text-danger small mt-1">
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ field.errors|striptags }}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+
+            <!-- Antecedentes y Otros -->
+            <div class="row g-4 mb-4">
+              <div class="col-12">
+                <h5 class="text-secondary border-bottom pb-2 mb-3">
+                  <i class="fas fa-history me-2"></i>Antecedentes y Otros
+                </h5>
+              </div>
+              {% for field in form %}
+                {% if field.name == 'antecedentes_quirurgicos' or field.name == 'antecedentes_familiares' or field.name == 'seguro_medico' or field.name == 'numero_seguro' or field.name == 'ocupacion' or field.name == 'estado_civil' or field.name == 'notas' %}
+                <div class="col-12 col-md-{% if field.name == 'notas' %}12{% else %}6{% endif %}">
+                  <div class="mb-3">
+                    <label for="id_{{ field.name }}" class="form-label fw-semibold">
+                      {% if field.name == 'antecedentes_quirurgicos' %}
+                        <i class="fas fa-procedures me-2 text-secondary"></i>
+                      {% elif field.name == 'antecedentes_familiares' %}
+                        <i class="fas fa-users me-2 text-secondary"></i>
+                      {% elif field.name == 'seguro_medico' %}
+                        <i class="fas fa-shield-alt me-2 text-secondary"></i>
+                      {% elif field.name == 'numero_seguro' %}
+                        <i class="fas fa-hashtag me-2 text-secondary"></i>
+                      {% elif field.name == 'ocupacion' %}
+                        <i class="fas fa-briefcase me-2 text-secondary"></i>
+                      {% elif field.name == 'estado_civil' %}
+                        <i class="fas fa-heart me-2 text-secondary"></i>
+                      {% elif field.name == 'notas' %}
+                        <i class="fas fa-sticky-note me-2 text-secondary"></i>
+                      {% endif %}
+                      {{ field.label }}
+                      {% if field.field.required %}
+                        <span class="text-danger">*</span>
+                      {% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.errors %}
+                      <div class="text-danger small mt-1">
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ field.errors|striptags }}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+
+            <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mt-4">
+              <a href="/pacientes/gestionar/" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Cancelar
+              </a>
+              <button type="submit" class="btn btn-success">
+                <i class="fas fa-save me-2"></i>Guardar Cambios
+              </button>
             </div>
           </form>
         </div>
@@ -33,4 +217,81 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<style>
+/* Estilos adicionales para mejorar la apariencia */
+.form-control, .form-select {
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+  transform: scale(1.02);
+}
+
+.form-label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #495057;
+}
+
+.card {
+  border: none;
+  border-radius: 15px;
+}
+
+.card-header {
+  border-radius: 15px 15px 0 0 !important;
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+}
+
+.border-bottom {
+  border-bottom: 2px solid !important;
+  padding-bottom: 8px;
+  margin-bottom: 20px;
+}
+
+.text-danger {
+  font-weight: 500;
+}
+
+/* Animaciones suaves */
+.mb-3 {
+  transition: all 0.2s ease;
+}
+
+.mb-3:hover {
+  transform: translateY(-2px);
+}
+
+/* Mejorar textarea */
+textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Iconos más visibles */
+.fas {
+  font-size: 16px;
+}
+
+/* Botones mejorados */
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 10px 20px;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+</style>
 {% endblock %}

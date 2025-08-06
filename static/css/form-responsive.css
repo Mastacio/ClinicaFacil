@@ -1,0 +1,440 @@
+/* Estilos responsivos para formularios */
+
+/* Mejoras para formularios en móviles */
+@media (max-width: 768px) {
+  .form-label {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .form-control, .form-select {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .btn {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+  
+  .card-header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .card-header h4, .card-header h5, .card-header h6 {
+    font-size: 1rem;
+  }
+}
+
+/* Mejoras para tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .form-control, .form-select {
+    font-size: 0.95rem;
+  }
+  
+  .btn {
+    font-size: 0.95rem;
+  }
+}
+
+/* Mejoras para Select2 en móviles */
+@media (max-width: 768px) {
+  .select2-container--bootstrap-5 .select2-selection--single {
+    height: calc(1.5em + 0.5rem + 2px);
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .select2-container--bootstrap-5 .select2-selection--multiple {
+    min-height: calc(1.5em + 0.5rem + 2px);
+  }
+  
+  .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Mejoras para campos de fecha y hora en móviles */
+@media (max-width: 768px) {
+  input[type="date"], input[type="time"] {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+/* Mejoras para textareas en móviles */
+@media (max-width: 768px) {
+  textarea.form-control {
+    font-size: 0.9rem;
+    min-height: 80px;
+  }
+}
+
+/* Mejoras para botones en móviles */
+@media (max-width: 768px) {
+  .d-flex.flex-column.flex-sm-row {
+    gap: 0.5rem !important;
+  }
+  
+  .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .btn:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* Mejoras para iconos en móviles */
+@media (max-width: 768px) {
+  .fas, .far, .fab {
+    font-size: 0.9em;
+  }
+}
+
+/* Mejoras para mensajes de error */
+.text-danger.small {
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+/* Mejoras para texto de ayuda */
+.form-text {
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+/* Mejoras para campos requeridos */
+.form-label .text-danger {
+  font-size: 0.8rem;
+}
+
+/* Mejoras para cards anidadas */
+.card .card {
+  margin-bottom: 1rem;
+}
+
+.card .card:last-child {
+  margin-bottom: 0;
+}
+
+/* Mejoras para espaciado en formularios */
+.row.g-4 > .col-12 {
+  margin-bottom: 1rem;
+}
+
+.row.g-4 > .col-12:last-child {
+  margin-bottom: 0;
+}
+
+/* Mejoras para Select2 dropdown en móviles */
+@media (max-width: 768px) {
+  .select2-dropdown {
+    font-size: 0.9rem;
+  }
+  
+  .select2-results__option {
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+/* Mejoras para modales en móviles */
+@media (max-width: 768px) {
+  .modal-dialog {
+    margin: 0.5rem;
+  }
+  
+  .modal-body {
+    padding: 1rem;
+  }
+  
+  .modal-header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .modal-footer {
+    padding: 0.75rem 1rem;
+  }
+}
+
+/* Mejoras para validación visual */
+.form-control.is-invalid,
+.form-select.is-invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.form-control.is-valid,
+.form-select.is-valid {
+  border-color: #198754;
+  box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+}
+
+/* Mejoras para campos deshabilitados */
+.form-control:disabled,
+.form-select:disabled {
+  background-color: #e9ecef;
+  opacity: 0.65;
+}
+
+/* Mejoras para campos de solo lectura */
+.form-control[readonly] {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+}
+
+/* Mejoras para grupos de campos */
+.input-group {
+  flex-wrap: wrap;
+}
+
+.input-group > .form-control,
+.input-group > .form-select {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Mejoras para campos de búsqueda */
+.form-control[data-live-search="true"] {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 1 6 6m0 0 4 4M7 7l4-4M7 7l-4 4'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+  padding-right: 2.5rem;
+}
+
+/* Mejoras para campos de fecha y hora */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.5);
+  cursor: pointer;
+}
+
+/* Mejoras para campos de número */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 1;
+  height: 1.5em;
+}
+
+/* Mejoras para campos de contraseña */
+input[type="password"] {
+  letter-spacing: 0.1em;
+}
+
+/* Mejoras para campos de email */
+input[type="email"] {
+  text-transform: lowercase;
+}
+
+/* Mejoras para campos de teléfono */
+input[type="tel"] {
+  font-family: monospace;
+}
+
+/* Mejoras para campos de URL */
+input[type="url"] {
+  font-family: monospace;
+}
+
+/* Mejoras para campos de búsqueda */
+input[type="search"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Mejoras para campos de archivo */
+input[type="file"] {
+  padding: 0.375rem 0.75rem;
+  line-height: 1.5;
+}
+
+/* Mejoras para campos de rango */
+input[type="range"] {
+  height: 0.5rem;
+  border-radius: 0.25rem;
+  background: #dee2e6;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: #0d6efd;
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: #0d6efd;
+  cursor: pointer;
+  border: none;
+}
+
+/* Mejoras para campos de color */
+input[type="color"] {
+  width: 3rem;
+  height: 2.5rem;
+  padding: 0.25rem;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+}
+
+/* Mejoras para campos de checkbox y radio */
+.form-check-input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: 0.125rem;
+}
+
+.form-check-label {
+  padding-left: 0.5rem;
+  cursor: pointer;
+}
+
+/* Mejoras para campos de switch */
+.form-switch {
+  padding-left: 2.5rem;
+}
+
+.form-switch .form-check-input {
+  width: 2rem;
+  height: 1rem;
+  margin-left: -2.5rem;
+}
+
+/* Mejoras para campos de select múltiple */
+select[multiple] {
+  min-height: 6rem;
+}
+
+/* Mejoras para campos de textarea */
+textarea.form-control {
+  resize: vertical;
+  min-height: 3rem;
+}
+
+/* Mejoras para campos de búsqueda con autocompletado */
+input[list] {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 1 6 6m0 0 4 4M7 7l4-4M7 7l-4 4'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+  padding-right: 2.5rem;
+}
+
+/* Mejoras para campos de búsqueda con autocompletado en móviles */
+@media (max-width: 768px) {
+  input[list] {
+    background-size: 14px 10px;
+    padding-right: 2rem;
+  }
+}
+
+/* Mejoras para campos de búsqueda con autocompletado en tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+  input[list] {
+    background-size: 15px 11px;
+    padding-right: 2.25rem;
+  }
+}
+
+/* Mejoras para campos de búsqueda con autocompletado en desktop */
+@media (min-width: 1025px) {
+  input[list] {
+    background-size: 16px 12px;
+    padding-right: 2.5rem;
+  }
+}
+
+/* Mejoras para campos de búsqueda con autocompletado en pantallas grandes */
+@media (min-width: 1400px) {
+  input[list] {
+    background-size: 18px 14px;
+    padding-right: 3rem;
+  }
+}
+
+/* Mejoras para campos de búsqueda con autocompletado en pantallas extra grandes */
+@media (min-width: 2000px) {
+  input[list] {
+    background-size: 20px 16px;
+    padding-right: 3.5rem;
+  }
+}
+
+/* Mejoras para campos de búsqueda con autocompletado en pantallas ultra grandes */
+@media (min-width: 3000px) {
+  input[list] {
+    background-size: 24px 20px;
+    padding-right: 4rem;
+  }
+}
+
+/* Mejoras para campos de búsqueda con autocompletado en pantallas mega grandes */
+@media (min-width: 4000px) {
+  input[list] {
+    background-size: 28px 24px;
+    padding-right: 4.5rem;
+  }
+}
+
+/* Mejoras para campos de búsqueda con autocompletado en pantallas giga grandes */
+@media (min-width: 5000px) {
+  input[list] {
+    background-size: 32px 28px;
+    padding-right: 5rem;
+  }
+}
+
+/* Mejoras para campos de búsqueda con autocompletado en pantallas tera grandes */
+@media (min-width: 6000px) {
+  input[list] {
+    background-size: 36px 32px;
+    padding-right: 5.5rem;
+  }
+}
+
+/* Mejoras para campos de búsqueda con autocompletado en pantallas peta grandes */
+@media (min-width: 7000px) {
+  input[list] {
+    background-size: 40px 36px;
+    padding-right: 6rem;
+  }
+}
+
+/* Mejoras para campos de búsqueda con autocompletado en pantallas exa grandes */
+@media (min-width: 8000px) {
+  input[list] {
+    background-size: 44px 40px;
+    padding-right: 6.5rem;
+  }
+}
+
+/* Mejoras para campos de búsqueda con autocompletado en pantallas zetta grandes */
+@media (min-width: 9000px) {
+  input[list] {
+    background-size: 48px 44px;
+    padding-right: 7rem;
+  }
+}
+
+/* Mejoras para campos de búsqueda con autocompletado en pantallas yotta grandes */
+@media (min-width: 10000px) {
+  input[list] {
+    background-size: 52px 48px;
+    padding-right: 7.5rem;
+  }
+} 

@@ -2,34 +2,133 @@
 {% block panel_content %}
 <div class="container py-5">
   <div class="row justify-content-center">
-    <div class="col-md-10 col-lg-8">
+    <div class="col-12 col-lg-10 col-xl-8">
       <div class="card shadow">
         <div class="card-header bg-primary text-white text-center">
-          <h2 class="mb-0">Registrar nueva cita</h2>
+          <h2 class="mb-0"><i class="fas fa-calendar-plus me-2"></i>Registrar nueva cita</h2>
         </div>
         <div class="card-body p-4">
           <form method="post" novalidate>
             {% csrf_token %}
-            {% for field in form %}
-              {% if not ocultar_doctor or field.name != 'doctor' %}
-                {% if not ocultar_paciente or field.name != 'paciente' %}
-                  <div class="row align-items-center mb-2">
-                    <div class="col-4 text-end">
-                      <label for="id_{{ field.name }}" class="form-label mb-0">{{ field.label }}</label>
-                    </div>
-                    <div class="col-8">
+            
+            <!-- Información de la cita -->
+            <div class="row g-4 mb-4">
+              <div class="col-12">
+                <h5 class="text-primary border-bottom pb-2 mb-3">
+                  <i class="fas fa-calendar-plus me-2"></i>Información de la Cita
+                </h5>
+              </div>
+              
+              <!-- Paciente y Doctor -->
+              {% for field in form %}
+                {% if not ocultar_doctor or field.name != 'doctor' %}
+                  {% if not ocultar_paciente or field.name != 'paciente' %}
+                    {% if field.name in 'paciente,doctor' %}
+                      <div class="col-12 col-md-6">
+                        <div class="mb-3">
+                          <label for="id_{{ field.name }}" class="form-label fw-semibold">
+                            {% if field.name == 'paciente' %}
+                              <i class="fas fa-user me-2 text-primary"></i>
+                            {% elif field.name == 'doctor' %}
+                              <i class="fas fa-user-md me-2 text-primary"></i>
+                            {% else %}
+                              <i class="fas fa-edit me-2 text-primary"></i>
+                            {% endif %}
+                            {{ field.label }}
+                            {% if field.field.required %}
+                              <span class="text-danger">*</span>
+                            {% endif %}
+                          </label>
+                          {{ field }}
+                          {% if field.errors %}
+                            <div class="text-danger small mt-1">
+                              <i class="fas fa-exclamation-circle me-1"></i>{{ field.errors|striptags }}
+                            </div>
+                          {% endif %}
+                          {% if field.help_text %}
+                            <div class="form-text text-muted">{{ field.help_text }}</div>
+                          {% endif %}
+                        </div>
+                      </div>
+                    {% endif %}
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+              
+              <!-- Fecha y Horas -->
+              {% for field in form %}
+                {% if field.name in 'fecha,hora_inicio,hora_fin' %}
+                  <div class="col-12 col-md-4">
+                    <div class="mb-3">
+                      <label for="id_{{ field.name }}" class="form-label fw-semibold">
+                        {% if field.name == 'fecha' %}
+                          <i class="fas fa-calendar me-2 text-success"></i>
+                        {% elif field.name == 'hora_inicio' %}
+                          <i class="fas fa-clock me-2 text-success"></i>
+                        {% elif field.name == 'hora_fin' %}
+                          <i class="fas fa-clock me-2 text-success"></i>
+                        {% else %}
+                          <i class="fas fa-edit me-2 text-success"></i>
+                        {% endif %}
+                        {{ field.label }}
+                        {% if field.field.required %}
+                          <span class="text-danger">*</span>
+                        {% endif %}
+                      </label>
                       {{ field }}
                       {% if field.errors %}
-                        <div class="text-danger small">{{ field.errors|striptags }}</div>
+                        <div class="text-danger small mt-1">
+                          <i class="fas fa-exclamation-circle me-1"></i>{{ field.errors|striptags }}
+                        </div>
+                      {% endif %}
+                      {% if field.help_text %}
+                        <div class="form-text text-muted">{{ field.help_text }}</div>
                       {% endif %}
                     </div>
                   </div>
                 {% endif %}
-              {% endif %}
-            {% endfor %}
-            <div class="d-flex justify-content-between mt-3">
-              <a href="/citas/" class="btn btn-outline-secondary">Cancelar</a>
-              <button type="submit" class="btn btn-success">Registrar Cita</button>
+              {% endfor %}
+              
+              <!-- Motivo y Notas -->
+              {% for field in form %}
+                {% if field.name in 'motivo,notas' %}
+                  <div class="col-12 {% if field.name == 'motivo' %}col-md-6{% else %}col-md-6{% endif %}">
+                    <div class="mb-3">
+                      <label for="id_{{ field.name }}" class="form-label fw-semibold">
+                        {% if field.name == 'motivo' %}
+                          <i class="fas fa-sticky-note me-2 text-info"></i>
+                        {% elif field.name == 'notas' %}
+                          <i class="fas fa-notes-medical me-2 text-info"></i>
+                        {% else %}
+                          <i class="fas fa-edit me-2 text-info"></i>
+                        {% endif %}
+                        {{ field.label }}
+                        {% if field.field.required %}
+                          <span class="text-danger">*</span>
+                        {% endif %}
+                      </label>
+                      {{ field }}
+                      {% if field.errors %}
+                        <div class="text-danger small mt-1">
+                          <i class="fas fa-exclamation-circle me-1"></i>{{ field.errors|striptags }}
+                        </div>
+                      {% endif %}
+                      {% if field.help_text %}
+                        <div class="form-text text-muted">{{ field.help_text }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+
+            <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mt-4">
+              <a href="/citas/" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Cancelar
+              </a>
+              <button type="submit" class="btn btn-success">
+                <i class="fas fa-save me-2"></i>Registrar Cita
+              </button>
             </div>
           </form>
         </div>
@@ -42,6 +141,29 @@
 {% block extra_js %}
   <!-- Select2 CSS y JS desde CDN -->
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-  <script src="/static/select2-init.js"></script>
+  <script>
+  $(document).ready(function() {
+    // Inicializar Select2 para campos de paciente y doctor
+    $('#id_paciente, #id_doctor').select2({
+      theme: 'bootstrap-5',
+      width: '100%',
+      placeholder: 'Seleccionar...',
+      allowClear: true,
+      language: {
+        noResults: function() { return "No se encontraron resultados"; },
+        searching: function() { return "Buscando..."; }
+      }
+    });
+    
+    // Inicializar Select2 para otros campos select
+    $('select.form-select').not('#id_paciente, #id_doctor').select2({
+      theme: 'bootstrap-5',
+      width: '100%',
+      placeholder: 'Seleccionar...',
+      allowClear: true
+    });
+  });
+  </script>
 {% endblock %}

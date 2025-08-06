@@ -5,99 +5,173 @@
 {% block content %}
 <div class="container-fluid">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-gradient-primary text-white">
-                    <div class="d-flex justify-content-between align-items-center">
+        <div class="col-12 col-lg-10 col-xl-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
                         <div>
                             <h4 class="mb-0">
                                 <i class="fas fa-pills me-2"></i>
                                 Agregar Medicamento
                             </h4>
-                            <small>{{ gestion.paciente.user.get_full_name }} - {{ gestion.cita.fecha|date:"d/m/Y" }}</small>
+                            <small class="text-light">
+                                <i class="fas fa-user me-1"></i>{{ gestion.paciente.user.get_full_name }} 
+                                <span class="mx-2">|</span>
+                                <i class="fas fa-calendar me-1"></i>{{ gestion.cita.fecha|date:"d/m/Y" }}
+                            </small>
                         </div>
-                        <a href="{% url 'gestion:gestionar_cita' gestion.cita.id %}?{{ request.GET.urlencode }}" class="btn btn-light btn-sm">
+                        <a href="{% url 'gestion:gestionar_cita' gestion.cita.id %}?{{ request.GET.urlencode }}" class="btn btn-light btn-sm mt-2 mt-md-0">
                             <i class="fas fa-arrow-left me-1"></i>Volver
                         </a>
                     </div>
                 </div>
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.medicamento.id_for_label }}" class="form-label">
-                                    <i class="fas fa-pills me-1"></i>Medicamento
-                                </label>
-                                {{ form.medicamento }}
-                                {% if form.medicamento.errors %}
-                                    <div class="text-danger small">{{ form.medicamento.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.dosis.id_for_label }}" class="form-label">
-                                    <i class="fas fa-balance-scale me-1"></i>Dosis
-                                </label>
-                                {{ form.dosis }}
-                                {% if form.dosis.errors %}
-                                    <div class="text-danger small">{{ form.dosis.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.frecuencia.id_for_label }}" class="form-label">
-                                    <i class="fas fa-clock me-1"></i>Frecuencia
-                                </label>
-                                {{ form.frecuencia }}
-                                {% if form.frecuencia.errors %}
-                                    <div class="text-danger small">{{ form.frecuencia.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.duracion.id_for_label }}" class="form-label">
-                                    <i class="fas fa-calendar-alt me-1"></i>Duración
-                                </label>
-                                {{ form.duracion }}
-                                {% if form.duracion.errors %}
-                                    <div class="text-danger small">{{ form.duracion.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.fecha_inicio.id_for_label }}" class="form-label">
-                                    <i class="fas fa-calendar-plus me-1"></i>Fecha de Inicio
-                                </label>
-                                {{ form.fecha_inicio }}
-                                {% if form.fecha_inicio.errors %}
-                                    <div class="text-danger small">{{ form.fecha_inicio.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.fecha_fin.id_for_label }}" class="form-label">
-                                    <i class="fas fa-calendar-minus me-1"></i>Fecha de Fin
-                                </label>
-                                {{ form.fecha_fin }}
-                                {% if form.fecha_fin.errors %}
-                                    <div class="text-danger small">{{ form.fecha_fin.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="{{ form.instrucciones.id_for_label }}" class="form-label">
-                                <i class="fas fa-clipboard-list me-1"></i>Instrucciones Especiales
-                            </label>
-                            {{ form.instrucciones }}
-                            {% if form.instrucciones.errors %}
-                                <div class="text-danger small">{{ form.instrucciones.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="d-flex justify-content-between">
+                        <div class="card-body p-4">
+          <form method="post" novalidate>
+            {% csrf_token %}
+            
+            <!-- Información del medicamento -->
+            <div class="row g-4 mb-4">
+              <div class="col-12">
+                <h5 class="text-primary border-bottom pb-2 mb-3">
+                  <i class="fas fa-pills me-2"></i>Información del Medicamento
+                </h5>
+              </div>
+              
+              <div class="col-12 col-md-6">
+                <div class="mb-3">
+                  <label for="{{ form.medicamento.id_for_label }}" class="form-label fw-semibold">
+                    <i class="fas fa-pills me-2 text-primary"></i>Medicamento
+                    <span class="text-danger">*</span>
+                  </label>
+                  {{ form.medicamento }}
+                  {% if form.medicamento.errors %}
+                    <div class="text-danger small mt-1">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ form.medicamento.errors.0 }}
+                    </div>
+                  {% endif %}
+                  {% if form.medicamento.help_text %}
+                    <div class="form-text text-muted">{{ form.medicamento.help_text }}</div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <div class="mb-3">
+                  <label for="{{ form.dosis.id_for_label }}" class="form-label fw-semibold">
+                    <i class="fas fa-balance-scale me-2 text-primary"></i>Dosis
+                    <span class="text-danger">*</span>
+                  </label>
+                  {{ form.dosis }}
+                  {% if form.dosis.errors %}
+                    <div class="text-danger small mt-1">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ form.dosis.errors.0 }}
+                    </div>
+                  {% endif %}
+                  {% if form.dosis.help_text %}
+                    <div class="form-text text-muted">{{ form.dosis.help_text }}</div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <div class="mb-3">
+                  <label for="{{ form.frecuencia.id_for_label }}" class="form-label fw-semibold">
+                    <i class="fas fa-clock me-2 text-primary"></i>Frecuencia
+                    <span class="text-danger">*</span>
+                  </label>
+                  {{ form.frecuencia }}
+                  {% if form.frecuencia.errors %}
+                    <div class="text-danger small mt-1">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ form.frecuencia.errors.0 }}
+                    </div>
+                  {% endif %}
+                  {% if form.frecuencia.help_text %}
+                    <div class="form-text text-muted">{{ form.frecuencia.help_text }}</div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <div class="mb-3">
+                  <label for="{{ form.duracion.id_for_label }}" class="form-label fw-semibold">
+                    <i class="fas fa-calendar-alt me-2 text-primary"></i>Duración
+                    <span class="text-danger">*</span>
+                  </label>
+                  {{ form.duracion }}
+                  {% if form.duracion.errors %}
+                    <div class="text-danger small mt-1">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ form.duracion.errors.0 }}
+                    </div>
+                  {% endif %}
+                  {% if form.duracion.help_text %}
+                    <div class="form-text text-muted">{{ form.duracion.help_text }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Fechas e instrucciones -->
+            <div class="row g-4 mb-4">
+              <div class="col-12">
+                <h5 class="text-success border-bottom pb-2 mb-3">
+                  <i class="fas fa-calendar me-2"></i>Fechas e Instrucciones
+                </h5>
+              </div>
+              
+              <div class="col-12 col-md-6">
+                <div class="mb-3">
+                  <label for="{{ form.fecha_inicio.id_for_label }}" class="form-label fw-semibold">
+                    <i class="fas fa-calendar-plus me-2 text-success"></i>Fecha de Inicio
+                    <span class="text-danger">*</span>
+                  </label>
+                  {{ form.fecha_inicio }}
+                  {% if form.fecha_inicio.errors %}
+                    <div class="text-danger small mt-1">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ form.fecha_inicio.errors.0 }}
+                    </div>
+                  {% endif %}
+                  {% if form.fecha_inicio.help_text %}
+                    <div class="form-text text-muted">{{ form.fecha_inicio.help_text }}</div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <div class="mb-3">
+                  <label for="{{ form.fecha_fin.id_for_label }}" class="form-label fw-semibold">
+                    <i class="fas fa-calendar-minus me-2 text-success"></i>Fecha de Fin
+                  </label>
+                  {{ form.fecha_fin }}
+                  {% if form.fecha_fin.errors %}
+                    <div class="text-danger small mt-1">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ form.fecha_fin.errors.0 }}
+                    </div>
+                  {% endif %}
+                  {% if form.fecha_fin.help_text %}
+                    <div class="form-text text-muted">{{ form.fecha_fin.help_text }}</div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="mb-3">
+                  <label for="{{ form.instrucciones.id_for_label }}" class="form-label fw-semibold">
+                    <i class="fas fa-clipboard-list me-2 text-success"></i>Instrucciones Especiales
+                  </label>
+                  {{ form.instrucciones }}
+                  {% if form.instrucciones.errors %}
+                    <div class="text-danger small mt-1">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ form.instrucciones.errors.0 }}
+                    </div>
+                  {% endif %}
+                  {% if form.instrucciones.help_text %}
+                    <div class="form-text text-muted">{{ form.instrucciones.help_text }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+                        <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mt-4">
                             <a href="{% url 'gestion:gestionar_cita' gestion.cita.id %}?{{ request.GET.urlencode }}" class="btn btn-outline-secondary">
                                 <i class="fas fa-times me-2"></i>Cancelar
                             </a>
@@ -111,4 +185,22 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Select2 CSS y JS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+  // Inicializar Select2 para el campo de medicamento
+  $('#id_medicamento').select2({
+    theme: 'bootstrap-5',
+    width: '100%',
+    placeholder: 'Seleccionar medicamento...',
+    allowClear: true
+  });
+});
+</script>
 {% endblock %} 

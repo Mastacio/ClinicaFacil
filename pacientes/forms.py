@@ -6,7 +6,7 @@ from .models import PacientePerfil
 User = get_user_model()
 
 class CrearPacienteForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput, initial='12345678', label='Contraseña inicial')
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}), initial='12345678', label='Contraseña inicial')
     email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}), label='Correo electrónico')
 
     class Meta:
@@ -38,13 +38,75 @@ class PacientePerfilForm(forms.ModelForm):
         model = PacientePerfil
         exclude = ['user', 'completado']
         widgets = {
-            'fecha_nacimiento': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'sexo': forms.Select(attrs={'class': 'form-control'}),
-            'tipo_sangre': forms.Select(attrs={'class': 'form-control'}),
-            'alergias': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}),
-            'enfermedades_cronicas': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}),
-            'medicamentos': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}),
-            'antecedentes_quirurgicos': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}),
-            'antecedentes_familiares': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}),
-            'notas': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}),
+            'identificacion': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej: 12345678-9, DNI 12345678, etc.'
+            }),
+            'fecha_nacimiento': forms.DateInput(attrs={
+                'type': 'date', 
+                'class': 'form-control',
+                'placeholder': 'Selecciona la fecha de nacimiento'
+            }),
+            'sexo': forms.Select(attrs={
+                'class': 'form-control',
+                'placeholder': 'Selecciona el sexo'
+            }),
+            'tipo_sangre': forms.Select(attrs={
+                'class': 'form-control',
+                'placeholder': 'Selecciona el tipo de sangre'
+            }),
+            'telefono': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej: +1234567890'
+            }),
+            'direccion': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Dirección completa'
+            }),
+            'ciudad': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ciudad de residencia'
+            }),
+            'pais': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'País'
+            }),
+            'contacto_emergencia': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nombre del contacto de emergencia'
+            }),
+            'telefono_emergencia': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Teléfono de emergencia'
+            }),
+            'alergias': forms.Textarea(attrs={
+                'rows': 3, 
+                'class': 'form-control',
+                'placeholder': 'Describe las alergias conocidas...'
+            }),
+            'enfermedades_cronicas': forms.Textarea(attrs={
+                'rows': 3, 
+                'class': 'form-control',
+                'placeholder': 'Describe las enfermedades crónicas...'
+            }),
+            'medicamentos': forms.Textarea(attrs={
+                'rows': 3, 
+                'class': 'form-control',
+                'placeholder': 'Lista los medicamentos actuales...'
+            }),
+            'antecedentes_quirurgicos': forms.Textarea(attrs={
+                'rows': 3, 
+                'class': 'form-control',
+                'placeholder': 'Describe los antecedentes quirúrgicos...'
+            }),
+            'antecedentes_familiares': forms.Textarea(attrs={
+                'rows': 3, 
+                'class': 'form-control',
+                'placeholder': 'Describe los antecedentes familiares relevantes...'
+            }),
+            'notas': forms.Textarea(attrs={
+                'rows': 2, 
+                'class': 'form-control',
+                'placeholder': 'Notas adicionales...'
+            }),
         }

@@ -3,6 +3,7 @@ from django.conf import settings
 
 class PacientePerfil(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='perfil_paciente')
+    identificacion = models.CharField(max_length=50, blank=True, verbose_name="Número de Identificación", help_text="Cédula, DNI, Pasaporte, etc.")
     fecha_nacimiento = models.DateField(null=True, blank=True)
     sexo = models.CharField(max_length=10, choices=[('masculino','Masculino'),('femenino','Femenino'),('otro','Otro')], blank=True)
     tipo_sangre = models.CharField(max_length=3, choices=[('A+','A+'),('A-','A-'),('B+','B+'),('B-','B-'),('AB+','AB+'),('AB-','AB-'),('O+','O+'),('O-','O-')], blank=True)

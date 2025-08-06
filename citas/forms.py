@@ -1,13 +1,15 @@
 from django import forms
 from .models import Cita
+from pacientes.models import PacientePerfil
+from doctores.models import DoctorPerfil
 
 class CitaForm(forms.ModelForm):
     class Meta:
         model = Cita
         fields = ['paciente', 'doctor', 'fecha', 'hora_inicio', 'hora_fin', 'motivo', 'notas']
         widgets = {
-                'paciente': forms.Select(attrs={'class': 'form-select select2-ajax-paciente', 'data-live-search': 'true'}),
-                'doctor': forms.Select(attrs={'class': 'form-select select2-ajax-doctor', 'data-live-search': 'true'}),
+            'paciente': forms.Select(attrs={'class': 'form-select', 'data-live-search': 'true'}),
+            'doctor': forms.Select(attrs={'class': 'form-select', 'data-live-search': 'true'}),
             'fecha': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'hora_inicio': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
             'hora_fin': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
@@ -18,6 +20,15 @@ class CitaForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial', {})
         super().__init__(*args, **kwargs)
+        
+        # Cargar pacientes y doctores disponibles
+        self.fields['paciente'].queryset = PacientePerfil.objects.select_related('user').all()
+        self.fields['doctor'].queryset = DoctorPerfil.objects.filter(activo=True).select_related('user')
+        
+        # Personalizar las etiquetas
+        self.fields['paciente'].label_from_instance = lambda obj: f"{obj.user.get_full_name()} ({obj.user.email})"
+        self.fields['doctor'].label_from_instance = lambda obj: f"{obj.user.get_full_name()} ({obj.user.email})"
+        
         if initial.get('paciente'):
             self.fields['paciente'].required = True
         if initial.get('doctor'):

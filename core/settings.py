@@ -88,11 +88,11 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'name',
-        'USER': 'user',
-        'PASSWORD': 'pass',
-        'HOST': 'host',
-        'PORT': 'port',
+        'NAME': 'clinica_facil',
+        'USER': 'UserSystem',
+        'PASSWORD': 'Wqh5$Rsu67e.',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
