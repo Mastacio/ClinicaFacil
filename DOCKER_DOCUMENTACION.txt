@@ -44,6 +44,8 @@ requirements.txt        - Dependencias de Python necesarias
 .dockerignore          - Archivos excluidos del contexto de Docker
 docker-build-push.sh   - Script automatizado para build y push (desarrollo)
 docker-prod.sh         - Script automatizado para build y push (producción)
+docker-dev-workflow.sh - Script completo para flujo de desarrollo (build/push/pull/run)
+test-docker.sh         - Script de pruebas
 DOCKER_README.md       - Documentación en formato Markdown
 DOCKER_DOCUMENTACION.txt - Este archivo de documentación
 
@@ -105,6 +107,327 @@ docker-compose down
 
 # Reconstruir después de cambios
 docker-compose up --build --force-recreate
+
+================================================================================
+                        4.1. DESARROLLO CON DOCKER
+================================================================================
+
+CONFIGURACIÓN DE DESARROLLO CON PUSH Y PULL:
+
+Esta sección explica cómo trabajar con la imagen Docker en modo desarrollo,
+incluyendo el proceso completo de push y pull de la imagen.
+
+PASO 1: CONSTRUIR Y HACER PUSH DE LA IMAGEN DE DESARROLLO
+
+# Login a Docker Hub (si no estás logueado)
+docker login
+
+# Construir imagen de desarrollo
+docker build -t tu-usuario/clinica-facil:dev .
+
+# Hacer push de la imagen de desarrollo
+docker push tu-usuario/clinica-facil:dev
+
+# O usar el script automatizado
+./docker-build-push.sh tu-usuario/clinica-facil dev
+
+PASO 2: PULL Y EJECUCIÓN EN OTRO ENTORNO
+
+# En otro equipo o servidor, hacer pull de la imagen
+docker pull tu-usuario/clinica-facil:dev
+
+# Ejecutar la aplicación en modo desarrollo
+docker run -p 8000:8000 \
+  -e DEBUG=True \
+  -e DJANGO_SETTINGS_MODULE=core.settings \
+  tu-usuario/clinica-facil:dev
+
+# Ejecutar en background
+docker run -d -p 8000:8000 \
+  -e DEBUG=True \
+  -e DJANGO_SETTINGS_MODULE=core.settings \
+  --name clinica-dev \
+  tu-usuario/clinica-facil:dev
+
+PASO 3: DESARROLLO CON VOLÚMENES (RECOMENDADO)
+
+# Ejecutar con volumen para cambios en tiempo real
+docker run -p 8000:8000 \
+  -v $(pwd):/app \
+  -e DEBUG=True \
+  -e DJANGO_SETTINGS_MODULE=core.settings \
+  tu-usuario/clinica-facil:dev
+
+# Con volúmenes específicos
+docker run -p 8000:8000 \
+  -v $(pwd)/core:/app/core \
+  -v $(pwd)/citas:/app/citas \
+  -v $(pwd)/static:/app/static \
+  -e DEBUG=True \
+  -e DJANGO_SETTINGS_MODULE=core.settings \
+  tu-usuario/clinica-facil:dev
+
+PASO 4: DESARROLLO CON BASE DE DATOS
+
+# Crear red para comunicación entre contenedores
+docker network create clinica-dev-network
+
+# Ejecutar base de datos
+docker run -d \
+  --name clinica-db \
+  --network clinica-dev-network \
+  -e POSTGRES_DB=clinica_facil \
+  -e POSTGRES_USER=clinica_user \
+  -e POSTGRES_PASSWORD=clinica_password \
+  -p 5432:5432 \
+  postgres:15
+
+# Ejecutar aplicación conectada a la base de datos
+docker run -p 8000:8000 \
+  --network clinica-dev-network \
+  -e DEBUG=True \
+  -e DJANGO_SETTINGS_MODULE=core.settings \
+  -e DATABASE_URL=postgresql://clinica_user:clinica_password@clinica-db:5432/clinica_facil \
+  tu-usuario/clinica-facil:dev
+
+PASO 5: COMANDOS DE DESARROLLO DENTRO DEL CONTENEDOR
+
+# Ejecutar comando Django dentro del contenedor
+docker exec -it clinica-dev python manage.py migrate
+
+# Crear superusuario
+docker exec -it clinica-dev python manage.py createsuperuser
+
+# Ejecutar shell de Django
+docker exec -it clinica-dev python manage.py shell
+
+# Recolectar archivos estáticos
+docker exec -it clinica-dev python manage.py collectstatic
+
+# Ejecutar tests
+docker exec -it clinica-dev python manage.py test
+
+PASO 6: ACTUALIZACIÓN DE LA IMAGEN
+
+# Después de hacer cambios en el código
+# Reconstruir la imagen
+docker build -t tu-usuario/clinica-facil:dev .
+
+# Hacer push de la nueva versión
+docker push tu-usuario/clinica-facil:dev
+
+# En otros equipos, hacer pull de la nueva versión
+docker pull tu-usuario/clinica-facil:dev
+
+# Detener contenedor anterior y ejecutar nueva versión
+docker stop clinica-dev
+docker rm clinica-dev
+docker run -d -p 8000:8000 \
+  -e DEBUG=True \
+  -e DJANGO_SETTINGS_MODULE=core.settings \
+  --name clinica-dev \
+  tu-usuario/clinica-facil:dev
+
+VARIABLES DE ENTORNO PARA DESARROLLO:
+
+DEBUG=True                           # Modo debug activado
+DJANGO_SETTINGS_MODULE=core.settings # Módulo de configuración
+DATABASE_URL=postgresql://...         # URL de base de datos (opcional)
+SECRET_KEY=dev-secret-key            # Clave secreta para desarrollo
+
+CONFIGURACIÓN AVANZADA PARA DESARROLLO:
+
+# Con variables de entorno desde archivo
+docker run -p 8000:8000 \
+  --env-file .env.dev \
+  tu-usuario/clinica-facil:dev
+
+# Con puerto personalizado
+docker run -p 8001:8000 \
+  -e DEBUG=True \
+  tu-usuario/clinica-facil:dev
+
+# Con logs detallados
+docker run -p 8000:8000 \
+  -e DEBUG=True \
+  -e DJANGO_LOG_LEVEL=DEBUG \
+  tu-usuario/clinica-facil:dev
+
+# Con persistencia de datos
+docker run -p 8000:8000 \
+  -v clinica-dev-data:/app/data \
+  -e DEBUG=True \
+  tu-usuario/clinica-facil:dev
+
+TROUBLESHOOTING PARA DESARROLLO:
+
+1. ERROR DE CONEXIÓN A BASE DE DATOS:
+   Verificar que el contenedor de BD esté ejecutándose
+   docker ps | grep clinica-db
+
+2. ERROR DE PUERTO OCUPADO:
+   Cambiar puerto: docker run -p 8001:8000 ...
+
+3. ERROR DE PERMISOS EN VOLÚMENES:
+   En Linux: sudo chown -R $USER:$USER .
+   En Windows: Verificar configuración de Docker Desktop
+
+4. ERROR DE MEMORIA:
+   Aumentar memoria en Docker Desktop
+   O usar: docker run --memory=2g ...
+
+COMANDOS ÚTILES PARA DESARROLLO:
+
+# Ver logs en tiempo real
+docker logs -f clinica-dev
+
+# Ejecutar comando específico
+docker exec clinica-dev python manage.py makemigrations
+
+# Copiar archivos del contenedor
+docker cp clinica-dev:/app/file.txt ./
+
+# Ver información del contenedor
+docker inspect clinica-dev
+
+# Reiniciar contenedor
+docker restart clinica-dev
+
+# Ver uso de recursos
+docker stats clinica-dev
+
+================================================================================
+                        4.2. SCRIPT DE FLUJO DE DESARROLLO
+================================================================================
+
+SCRIPT AUTOMATIZADO: docker-dev-workflow.sh
+
+Este script automatiza todo el flujo de desarrollo con Docker, incluyendo
+build, push, pull y ejecución de la imagen de desarrollo.
+
+USO BÁSICO:
+
+# Ver ayuda del script
+./docker-dev-workflow.sh help
+
+# Construir imagen de desarrollo
+./docker-dev-workflow.sh build mi-usuario dev
+
+# Hacer push de la imagen
+./docker-dev-workflow.sh push mi-usuario dev
+
+# Hacer pull de la imagen
+./docker-dev-workflow.sh pull mi-usuario dev
+
+# Ejecutar contenedor de desarrollo
+./docker-dev-workflow.sh run mi-usuario dev
+
+# Ejecutar con base de datos
+./docker-dev-workflow.sh run-db mi-usuario dev
+
+# Actualizar imagen (build + push)
+./docker-dev-workflow.sh update mi-usuario dev
+
+# Desplegar en otro equipo (pull + run)
+./docker-dev-workflow.sh deploy mi-usuario dev
+
+# Limpiar contenedores e imágenes
+./docker-dev-workflow.sh clean mi-usuario dev
+
+ACCIONES DISPONIBLES:
+
+1. build     - Construir imagen de desarrollo
+2. push      - Hacer push de la imagen a Docker Hub
+3. pull      - Hacer pull de la imagen desde Docker Hub
+4. run       - Ejecutar contenedor de desarrollo
+5. run-db    - Ejecutar con base de datos PostgreSQL
+6. update    - Build + Push (actualizar imagen)
+7. deploy    - Pull + Run (desplegar en otro equipo)
+8. clean     - Limpiar contenedores y imágenes
+9. help      - Mostrar ayuda
+
+EJEMPLOS PRÁCTICOS:
+
+# Flujo completo de desarrollo
+./docker-dev-workflow.sh build mi-usuario dev
+./docker-dev-workflow.sh push mi-usuario dev
+./docker-dev-workflow.sh run mi-usuario dev
+
+# En otro equipo, desplegar la aplicación
+./docker-dev-workflow.sh deploy mi-usuario dev
+
+# Después de cambios, actualizar
+./docker-dev-workflow.sh update mi-usuario dev
+
+# Ejecutar con base de datos completa
+./docker-dev-workflow.sh run-db mi-usuario dev
+
+CARACTERÍSTICAS DEL SCRIPT:
+
+✅ AUTOMATIZACIÓN COMPLETA:
+   - Build, push, pull y run en un solo comando
+   - Configuración automática de variables de entorno
+   - Gestión automática de contenedores
+
+✅ CONFIGURACIÓN DE DESARROLLO:
+   - Modo DEBUG activado
+   - Puerto 8000 configurado
+   - Variables de entorno optimizadas
+
+✅ INTEGRACIÓN CON BASE DE DATOS:
+   - PostgreSQL automático
+   - Red Docker configurada
+   - Conexión automática entre servicios
+
+✅ GESTIÓN DE RECURSOS:
+   - Limpieza automática de contenedores
+   - Gestión de imágenes
+   - Logs detallados
+
+✅ VALIDACIONES:
+   - Verificación de Docker instalado
+   - Verificación de login a Docker Hub
+   - Manejo de errores
+
+COMANDOS DE DESARROLLO CON EL SCRIPT:
+
+# Iniciar desarrollo completo
+./docker-dev-workflow.sh run-db mi-usuario dev
+
+# Ver logs de la aplicación
+docker logs -f clinica-dev
+
+# Ejecutar comandos Django
+docker exec -it clinica-dev python manage.py migrate
+docker exec -it clinica-dev python manage.py createsuperuser
+
+# Detener desarrollo
+docker stop clinica-dev clinica-db
+
+# Reiniciar aplicación
+docker restart clinica-dev
+
+VENTAJAS DEL SCRIPT:
+
+1. SIMPLICIDAD:
+   - Un comando para cada acción
+   - Configuración automática
+   - Menos errores manuales
+
+2. CONSISTENCIA:
+   - Mismo entorno en todos los equipos
+   - Configuración estandarizada
+   - Variables de entorno uniformes
+
+3. PRODUCTIVIDAD:
+   - Automatización de tareas repetitivas
+   - Flujo de trabajo optimizado
+   - Menos tiempo de configuración
+
+4. COLABORACIÓN:
+   - Fácil compartir configuración
+   - Entorno reproducible
+   - Onboarding simplificado
 
 ================================================================================
                             5. COMANDOS DOCKER
