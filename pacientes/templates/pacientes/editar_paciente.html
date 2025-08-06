@@ -159,33 +159,94 @@
               {% endfor %}
             </div>
 
-            <!-- Antecedentes y Otros -->
+            <!-- Antecedentes -->
             <div class="row g-4 mb-4">
               <div class="col-12">
                 <h5 class="text-secondary border-bottom pb-2 mb-3">
-                  <i class="fas fa-history me-2"></i>Antecedentes y Otros
+                  <i class="fas fa-history me-2"></i>Antecedentes
                 </h5>
               </div>
               {% for field in form %}
-                {% if field.name == 'antecedentes_quirurgicos' or field.name == 'antecedentes_familiares' or field.name == 'seguro_medico' or field.name == 'numero_seguro' or field.name == 'ocupacion' or field.name == 'estado_civil' or field.name == 'notas' %}
-                <div class="col-12 col-md-{% if field.name == 'notas' %}12{% else %}6{% endif %}">
+                {% if field.name == 'antecedentes_quirurgicos' or field.name == 'antecedentes_familiares' %}
+                <div class="col-12 col-md-6">
                   <div class="mb-3">
                     <label for="id_{{ field.name }}" class="form-label fw-semibold">
                       {% if field.name == 'antecedentes_quirurgicos' %}
                         <i class="fas fa-procedures me-2 text-secondary"></i>
                       {% elif field.name == 'antecedentes_familiares' %}
                         <i class="fas fa-users me-2 text-secondary"></i>
-                      {% elif field.name == 'seguro_medico' %}
-                        <i class="fas fa-shield-alt me-2 text-secondary"></i>
-                      {% elif field.name == 'numero_seguro' %}
-                        <i class="fas fa-hashtag me-2 text-secondary"></i>
-                      {% elif field.name == 'ocupacion' %}
-                        <i class="fas fa-briefcase me-2 text-secondary"></i>
-                      {% elif field.name == 'estado_civil' %}
-                        <i class="fas fa-heart me-2 text-secondary"></i>
-                      {% elif field.name == 'notas' %}
-                        <i class="fas fa-sticky-note me-2 text-secondary"></i>
                       {% endif %}
+                      {{ field.label }}
+                      {% if field.field.required %}
+                        <span class="text-danger">*</span>
+                      {% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.errors %}
+                      <div class="text-danger small mt-1">
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ field.errors|striptags }}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+
+            <!-- Información Adicional -->
+            <div class="row g-4 mb-4">
+              <div class="col-12">
+                <h5 class="text-purple border-bottom pb-2 mb-3" style="color: #6f42c1;">
+                  <i class="fas fa-user-circle me-2"></i>Información Adicional
+                </h5>
+              </div>
+              {% for field in form %}
+                {% if field.name == 'ocupacion' or field.name == 'estado_civil' or field.name == 'seguro_medico' or field.name == 'numero_seguro' %}
+                <div class="col-12 col-md-6">
+                  <div class="mb-3">
+                    <label for="id_{{ field.name }}" class="form-label fw-semibold">
+                      {% if field.name == 'ocupacion' %}
+                        <i class="fas fa-briefcase me-2" style="color: #6f42c1;"></i>
+                      {% elif field.name == 'estado_civil' %}
+                        <i class="fas fa-heart me-2" style="color: #6f42c1;"></i>
+                      {% elif field.name == 'seguro_medico' %}
+                        <i class="fas fa-shield-alt me-2" style="color: #6f42c1;"></i>
+                      {% elif field.name == 'numero_seguro' %}
+                        <i class="fas fa-hashtag me-2" style="color: #6f42c1;"></i>
+                      {% endif %}
+                      {{ field.label }}
+                      {% if field.field.required %}
+                        <span class="text-danger">*</span>
+                      {% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.errors %}
+                      <div class="text-danger small mt-1">
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ field.errors|striptags }}
+                      </div>
+                    {% endif %}
+                    {% if field.help_text %}
+                      <div class="form-text text-muted">{{ field.help_text }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+
+            <!-- Notas Adicionales -->
+            <div class="row g-4 mb-4">
+              <div class="col-12">
+                <h5 class="text-muted border-bottom pb-2 mb-3">
+                  <i class="fas fa-sticky-note me-2"></i>Notas Adicionales
+                </h5>
+              </div>
+              {% for field in form %}
+                {% if field.name == 'notas' %}
+                <div class="col-12">
+                  <div class="mb-3">
+                    <label for="id_{{ field.name }}" class="form-label fw-semibold">
+                      <i class="fas fa-comment me-2 text-muted"></i>
                       {{ field.label }}
                       {% if field.field.required %}
                         <span class="text-danger">*</span>
@@ -220,6 +281,11 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Select2 CSS y JS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <style>
 /* Estilos adicionales para mejorar la apariencia */
 .form-control, .form-select {
@@ -294,4 +360,74 @@ textarea.form-control {
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 </style>
+
+<script>
+$(document).ready(function() {
+  // Inicializar Select2 para campos select
+  $('select.form-control, select.form-select').select2({
+    theme: 'bootstrap-5',
+    width: '100%',
+    placeholder: 'Seleccionar...',
+    allowClear: true,
+    language: {
+      noResults: function() {
+        return "No se encontraron resultados";
+      },
+      searching: function() {
+        return "Buscando...";
+      }
+    }
+  });
+
+  // Validación mejorada de formularios
+  $('form').on('submit', function(e) {
+    let isValid = true;
+    
+    // Validar campos requeridos
+    $(this).find('[required]').each(function() {
+      if (!$(this).val()) {
+        $(this).addClass('is-invalid');
+        isValid = false;
+      } else {
+        $(this).removeClass('is-invalid').addClass('is-valid');
+      }
+    });
+
+    // Validar formato de email
+    const emailField = $('input[type="email"]');
+    if (emailField.length && emailField.val()) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(emailField.val())) {
+        emailField.addClass('is-invalid');
+        isValid = false;
+      }
+    }
+
+    if (!isValid) {
+      e.preventDefault();
+      // Scroll al primer campo con error
+      $('html, body').animate({
+        scrollTop: $('.is-invalid').first().offset().top - 100
+      }, 500);
+    }
+  });
+
+  // Remover clases de validación al escribir
+  $('.form-control, .form-select').on('input change', function() {
+    $(this).removeClass('is-invalid is-valid');
+  });
+
+  // Mejorar la experiencia con placeholders dinámicos
+  $('input[type="tel"], input[type="text"]').each(function() {
+    $(this).on('focus', function() {
+      $(this).attr('data-placeholder', $(this).attr('placeholder'));
+      $(this).attr('placeholder', '');
+    }).on('blur', function() {
+      if ($(this).attr('data-placeholder')) {
+        $(this).attr('placeholder', $(this).attr('data-placeholder'));
+      }
+    });
+  });
+});
+</script>
 {% endblock %}
