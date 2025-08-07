@@ -144,7 +144,9 @@ def calendario_doctor(request):
                         'hora_fin': hora_fin_str,
                         'esta_ocupado': esta_ocupado,
                         'info_cita': info_cita,
-                        'intervalo_minutos': horario.intervalo_minutos
+                        'intervalo_minutos': horario.intervalo_minutos,
+                        'consultorio': str(horario.consultorio),
+                        'consultorio_id': horario.consultorio.id if horario.consultorio else None
                     }
                     
                     t = hora_fin_slot
@@ -267,6 +269,7 @@ def crear_cita_modal(request):
     """
     doctor_id = request.GET.get('doctor')
     paciente_id = request.GET.get('paciente')
+    consultorio_id = request.GET.get('consultorio_id')
     initial = {}
     
     # Configurar valores iniciales
@@ -274,6 +277,8 @@ def crear_cita_modal(request):
         initial['doctor'] = doctor_id
     if paciente_id:
         initial['paciente'] = paciente_id
+    if consultorio_id:
+        initial['consultorio'] = consultorio_id
     
     fecha = request.GET.get('fecha')
     hora_inicio = request.GET.get('hora_inicio')

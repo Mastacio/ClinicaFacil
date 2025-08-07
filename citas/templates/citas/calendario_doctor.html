@@ -223,6 +223,7 @@
                                 for (let hora of intervalosDisponibles) {
                                     const slotInfo = slotsFecha[hora];
                                     const estaOcupado = citasFecha[hora];
+
                                     
                                     if (estaOcupado) {
                                         const citaInfo = citasFecha[hora];
@@ -239,8 +240,9 @@
                                         html += `
                                             <div class='col-6 col-md-4 col-lg-3 mb-2'>
                                                 <a href='#' class='slot-disponible p-2 rounded text-center text-decoration-none d-block crear-cita-link' 
-                                                   data-fecha='${fecha}' data-hora='${hora}'>
+                                                   data-fecha='${fecha}' data-hora='${hora}' data-consultorio='${slotInfo.consultorio_id}'>
                                                     <div class='slot-info'>${hora} - ${horaFin}</div>
+                                                    <div class='slot-info'>${slotInfo.consultorio}</div>
                                                     <div class='slot-paciente'>Disponible</div>
                                                     <small class='text-light opacity-75'>Click para agendar</small>
                                                 </a>
@@ -283,10 +285,12 @@
                     
                     const fecha = this.dataset.fecha;
                     const hora = this.dataset.hora;
-                    abrirModalCrearCita(fecha, hora);
+                    const consultorio = this.dataset.consultorio;
+
+                    abrirModalCrearCita(fecha, hora, consultorio);
                 }
 
-                function abrirModalCrearCita(fecha, hora) {
+                function abrirModalCrearCita(fecha, hora, consultorio) {
                     if (isModalLoading) {
                         return;
                     }
@@ -317,7 +321,7 @@
                     
                     // Cargar formulario después de un delay más largo
                     setTimeout(() => {
-                        const url = `/citas/crear-modal/?doctor={{ doctor.pk }}&fecha=${fecha}&hora_inicio=${hora}`;
+                        const url = `/citas/crear-modal/?doctor={{ doctor.pk }}&fecha=${fecha}&hora_inicio=${hora}&consultorio_id=${consultorio}`;
                         
                         fetch(url, {
                             headers: {
