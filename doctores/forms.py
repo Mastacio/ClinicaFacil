@@ -1,17 +1,47 @@
 from django import forms
 from users.models import User
-from .models import DoctorPerfil, Especialidad, HorarioDoctor
+from .models import DoctorPerfil, Especialidad, HorarioDoctor, Consultorio
+
+class ConsultorioForm(forms.ModelForm):
+    class Meta:
+        model = Consultorio
+        fields = ['nombre', 'descripcion', 'ubicacion', 'capacidad', 'activo']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'ubicacion': forms.TextInput(attrs={'class': 'form-control'}),
+            'capacidad': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 10}),
+            'activo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
 
 class HorarioDoctorForm(forms.ModelForm):
     class Meta:
         model = HorarioDoctor
-        fields = ['dia_semana', 'hora_inicio', 'hora_fin', 'intervalo_minutos']
+        fields = ['consultorio', 'dia_semana', 'hora_inicio', 'hora_fin', 'intervalo_minutos']
         widgets = {
+            'consultorio': forms.Select(attrs={'class': 'form-select'}),
             'dia_semana': forms.Select(attrs={'class': 'form-select'}),
             'hora_inicio': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
             'hora_fin': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
             'intervalo_minutos': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 180, 'step': 1}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Filtrar solo consultorios activos
+        self.fields['consultorio'].queryset = Consultorio.objects.filter(activo=True)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        hora_inicio = cleaned_data.get('hora_inicio')
+        hora_fin = cleaned_data.get('hora_fin')
+        consultorio = cleaned_data.get('consultorio')
+        dia_semana = cleaned_data.get('dia_semana')
+        
+        if hora_inicio and hora_fin and hora_inicio >= hora_fin:
+            raise forms.ValidationError('La hora de fin debe ser posterior a la hora de inicio.')
+        
+        return cleaned_data
 
 class CrearDoctorForm(forms.ModelForm):
     email = forms.EmailField(label='Correo electrónico', widget=forms.EmailInput(attrs={'class': 'form-control'}))

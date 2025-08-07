@@ -54,6 +54,19 @@
                         <span class="link-text">Doctores</span>
                 </a>
             </li>
+
+            <!-- Consultorios -->
+                <li class="side-menu-item">
+                    <a class="side-menu-link {% if request.resolver_match.url_name == 'gestionar_consultorios' %}active{% endif %}" href="/doctores/consultorios/">
+                        <div class="link-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-clinic-medical" viewBox="0 0 16 16">
+                                <path d="M8 1a1 1 0 0 1 1 1v1h1.5a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H9v1a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V7H5.5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1H7V2a1 1 0 0 1 1-1z"/>
+                                <path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/>
+                            </svg>
+                        </div>
+                        <span class="link-text">Consultorios</span>
+                </a>
+            </li>
             {% endif %}
 
             {% if user.role == 'doctor' or user.role == 'asistente' or user.role == 'admin' %}

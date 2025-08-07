@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Consultorio - {{ consultorio.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-clinic-medical me-2"></i>
+                        {{ consultorio.nombre }}
+                    </h4>
+                    <div>
+                        {% if user.role == 'admin' %}
+                        <a href="{% url 'editar_consultorio' consultorio.pk %}" class="btn btn-warning me-2">
+                            <i class="fas fa-edit me-1"></i>
+                            Editar
+                        </a>
+                        <a href="{% url 'activar_desactivar_consultorio' consultorio.pk %}" 
+                           class="btn {% if consultorio.activo %}btn-danger{% else %}btn-success{% endif %}"
+                           onclick="return confirm('¿Estás seguro de que quieres {% if consultorio.activo %}desactivar{% else %}activar{% endif %} este consultorio?')">
+                            <i class="fas {% if consultorio.activo %}fa-times{% else %}fa-check{% endif %} me-1"></i>
+                            {% if consultorio.activo %}Desactivar{% else %}Activar{% endif %}
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Información del consultorio -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-info-circle me-2"></i>Información General</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Nombre:</strong></td>
+                                    <td>{{ consultorio.nombre }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Ubicación:</strong></td>
+                                    <td>{{ consultorio.ubicacion|default:"No especificada" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Capacidad:</strong></td>
+                                    <td>
+                                        <span class="badge bg-info">{{ consultorio.capacidad }} paciente(s)</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Estado:</strong></td>
+                                    <td>
+                                        {% if consultorio.activo %}
+                                        <span class="badge bg-success">Activo</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Inactivo</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Creado:</strong></td>
+                                    <td>{{ consultorio.creado_en|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Última actualización:</strong></td>
+                                    <td>{{ consultorio.actualizado_en|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-file-alt me-2"></i>Descripción</h5>
+                            {% if consultorio.descripcion %}
+                            <div class="card">
+                                <div class="card-body">
+                                    {{ consultorio.descripcion|linebreaks }}
+                                </div>
+                            </div>
+                            {% else %}
+                            <p class="text-muted">No hay descripción disponible</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Doctores que usan este consultorio -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5>
+                                <i class="fas fa-user-md me-2"></i>
+                                Doctores que utilizan este consultorio
+                                <span class="badge bg-primary ms-2">{{ doctores_activos.count }}</span>
+                            </h5>
+                            {% if doctores_activos %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Doctor</th>
+                                            <th>Especialidades</th>
+                                            <th>Identificación</th>
+                                            <th>Teléfono</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for doctor in doctores_activos %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ doctor.user.get_full_name }}</strong>
+                                                <br><small class="text-muted">{{ doctor.user.email }}</small>
+                                            </td>
+                                            <td>
+                                                {% for especialidad in doctor.especialidades.all %}
+                                                <span class="badge bg-secondary me-1">{{ especialidad.nombre }}</span>
+                                                {% endfor %}
+                                            </td>
+                                            <td>{{ doctor.identificacion }}</td>
+                                            <td>{{ doctor.telefono|default:"No especificado" }}</td>
+                                            <td>
+                                                {% if doctor.activo %}
+                                                <span class="badge bg-success">Activo</span>
+                                                {% else %}
+                                                <span class="badge bg-danger">Inactivo</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                No hay doctores asignados a este consultorio actualmente.
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Horarios del consultorio -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h5>
+                                <i class="fas fa-clock me-2"></i>
+                                Horarios del consultorio
+                                <span class="badge bg-primary ms-2">{{ horarios_activos.count }}</span>
+                            </h5>
+                            {% if horarios_activos %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Doctor</th>
+                                            <th>Día</th>
+                                            <th>Horario</th>
+                                            <th>Intervalo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for horario in horarios_activos %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ horario.doctor.user.get_full_name }}</strong>
+                                                <br><small class="text-muted">{{ horario.doctor.user.email }}</small>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-primary">{{ horario.get_dia_semana_display }}</span>
+                                            </td>
+                                            <td>
+                                                <strong>{{ horario.hora_inicio|time:"H:i" }} - {{ horario.hora_fin|time:"H:i" }}</strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">{{ horario.intervalo_minutos }} min</span>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                No hay horarios configurados para este consultorio.
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'gestionar_consultorios' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Volver a Consultorios
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

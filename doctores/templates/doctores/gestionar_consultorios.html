@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestionar Consultorios{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-clinic-medical me-2"></i>
+                        Gestionar Consultorios
+                    </h4>
+                    {% if user.role == 'admin' %}
+                    <a href="{% url 'crear_consultorio' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>
+                        Nuevo Consultorio
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <!-- Filtros -->
+                    <form method="get" class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" value="{{ nombre }}" placeholder="Buscar por nombre...">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="ubicacion" class="form-label">Ubicación</label>
+                            <input type="text" class="form-control" id="ubicacion" name="ubicacion" value="{{ ubicacion }}" placeholder="Buscar por ubicación...">
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-secondary me-2">
+                                <i class="fas fa-search me-1"></i>
+                                Buscar
+                            </button>
+                            <a href="{% url 'gestionar_consultorios' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i>
+                                Limpiar
+                            </a>
+                        </div>
+                    </form>
+
+                    <!-- Tabla de consultorios -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Ubicación</th>
+                                    <th>Capacidad</th>
+                                    <th>Estado</th>
+                                    <th>Doctores Activos</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for consultorio in page_obj %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ consultorio.nombre }}</strong>
+                                        {% if consultorio.descripcion %}
+                                        <br><small class="text-muted">{{ consultorio.descripcion|truncatechars:50 }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ consultorio.ubicacion|default:"No especificada" }}</td>
+                                    <td>
+                                        <span class="badge bg-info">{{ consultorio.capacidad }} paciente(s)</span>
+                                    </td>
+                                    <td>
+                                        {% if consultorio.activo %}
+                                        <span class="badge bg-success">Activo</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Inactivo</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% with doctores_count=consultorio.get_doctores_activos.count %}
+                                        <span class="badge bg-primary">{{ doctores_count }} doctor(es)</span>
+                                        {% endwith %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'ver_consultorio' consultorio.pk %}" class="btn btn-sm btn-outline-info" title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            {% if user.role == 'admin' %}
+                                            <a href="{% url 'editar_consultorio' consultorio.pk %}" class="btn btn-sm btn-outline-warning" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'activar_desactivar_consultorio' consultorio.pk %}" 
+                                               class="btn btn-sm {% if consultorio.activo %}btn-outline-danger{% else %}btn-outline-success{% endif %}"
+                                               title="{% if consultorio.activo %}Desactivar{% else %}Activar{% endif %}"
+                                               onclick="return confirm('¿Estás seguro de que quieres {% if consultorio.activo %}desactivar{% else %}activar{% endif %} este consultorio?')">
+                                                <i class="fas {% if consultorio.activo %}fa-times{% else %}fa-check{% endif %}"></i>
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <i class="fas fa-clinic-medical fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted">No se encontraron consultorios</p>
+                                        {% if user.role == 'admin' %}
+                                        <a href="{% url 'crear_consultorio' %}" class="btn btn-primary">
+                                            <i class="fas fa-plus me-1"></i>
+                                            Crear primer consultorio
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginación -->
+                    {% if page_obj.has_other_pages %}
+                    <nav aria-label="Paginación de consultorios">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if nombre %}&nombre={{ nombre }}{% endif %}{% if ubicacion %}&ubicacion={{ ubicacion }}{% endif %}">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if nombre %}&nombre={{ nombre }}{% endif %}{% if ubicacion %}&ubicacion={{ ubicacion }}{% endif %}">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if nombre %}&nombre={{ nombre }}{% endif %}{% if ubicacion %}&ubicacion={{ ubicacion }}{% endif %}">{{ num }}</a>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if nombre %}&nombre={{ nombre }}{% endif %}{% if ubicacion %}&ubicacion={{ ubicacion }}{% endif %}">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if nombre %}&nombre={{ nombre }}{% endif %}{% if ubicacion %}&ubicacion={{ ubicacion }}{% endif %}">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

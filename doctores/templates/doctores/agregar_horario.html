@@ -26,6 +26,24 @@
               
               <div class="col-12 col-md-6">
                 <div class="mb-3">
+                  <label for="id_{{ form.consultorio.name }}" class="form-label fw-semibold">
+                    <i class="fas fa-clinic-medical me-2 text-primary"></i>{{ form.consultorio.label }}
+                    <span class="text-danger">*</span>
+                  </label>
+                  {{ form.consultorio }}
+                  {% if form.consultorio.errors %}
+                    <div class="text-danger small mt-1">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ form.consultorio.errors|striptags }}
+                    </div>
+                  {% endif %}
+                  {% if form.consultorio.help_text %}
+                    <div class="form-text text-muted">{{ form.consultorio.help_text }}</div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <div class="mb-3">
                   <label for="id_{{ form.dia_semana.name }}" class="form-label fw-semibold">
                     <i class="fas fa-calendar-day me-2 text-primary"></i>{{ form.dia_semana.label }}
                     <span class="text-danger">*</span>
@@ -120,6 +138,14 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 $(document).ready(function() {
+  // Inicializar Select2 para el campo de consultorio
+  $('#id_consultorio').select2({
+    theme: 'bootstrap-5',
+    width: '100%',
+    placeholder: 'Seleccionar consultorio...',
+    allowClear: true
+  });
+  
   // Inicializar Select2 para el campo de día de la semana
   $('#id_dia_semana').select2({
     theme: 'bootstrap-5',
