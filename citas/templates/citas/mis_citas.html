@@ -146,6 +146,7 @@
                             <th>Fecha</th>
                             <th>Hora</th>
                             <th>Doctor</th>
+                            <th>Consultorio</th>
                             <th>Motivo</th>
                             <th>Estado</th>
                             <th>Acciones</th>
@@ -176,6 +177,15 @@
                                     Especialidad no especificada
                                   {% endif %}
                                 </small>
+                            </td>
+                            <td>
+                                {% if cita.consultorio %}
+                                    <strong>{{ cita.consultorio.nombre }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ cita.consultorio.ubicacion|default:"Sin ubicación" }}</small>
+                                {% else %}
+                                    <span class="text-muted">No asignado</span>
+                                {% endif %}
                             </td>
                             <td>
                                 <span class="text-truncate d-inline-block" style="max-width: 200px;" title="{{ cita.motivo }}">

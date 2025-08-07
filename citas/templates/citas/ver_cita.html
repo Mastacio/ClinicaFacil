@@ -69,6 +69,17 @@
             <dd class="col-sm-9">{{ cita.fecha|date:"d/m/Y" }} ({{ cita.fecha|date:"l" }})</dd>
             <dt class="col-sm-3">Hora</dt>
             <dd class="col-sm-9">{{ cita.hora_inicio|time:"H:i" }} - {{ cita.hora_fin|time:"H:i" }}</dd>
+            <dt class="col-sm-3">Consultorio</dt>
+            <dd class="col-sm-9">
+              {% if cita.consultorio %}
+                <span class="badge bg-info">{{ cita.consultorio.nombre }}</span>
+                {% if cita.consultorio.ubicacion %}
+                  <br><small class="text-muted">{{ cita.consultorio.ubicacion }}</small>
+                {% endif %}
+              {% else %}
+                <span class="text-muted">No asignado</span>
+              {% endif %}
+            </dd>
             <dt class="col-sm-3">Motivo</dt>
             <dd class="col-sm-9">{{ cita.motivo }}</dd>
             {% if cita.notas %}

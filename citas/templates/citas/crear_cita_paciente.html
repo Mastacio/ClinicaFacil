@@ -319,6 +319,18 @@ $(document).ready(function() {
             searching: function() { return "Buscando..."; }
         }
     });
+    
+    // Inicializar Select2 para el campo consultorio
+    $('#id_consultorio').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: 'Seleccionar consultorio...',
+        allowClear: true,
+        language: {
+            noResults: function() { return "No se encontraron consultorios"; },
+            searching: function() { return "Buscando..."; }
+        }
+    });
 });
 </script>
 

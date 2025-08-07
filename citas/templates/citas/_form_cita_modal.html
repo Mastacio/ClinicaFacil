@@ -267,5 +267,15 @@ document.addEventListener('DOMContentLoaded', function() {
             bsAlert.close();
         });
     }, 5000);
+    
+    // Inicializar Select2 para campos select si están disponibles
+    if (typeof $ !== 'undefined') {
+        $('#id_paciente, #id_doctor, #id_consultorio').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            placeholder: 'Seleccionar...',
+            allowClear: true
+        });
+    }
 });
 </script>

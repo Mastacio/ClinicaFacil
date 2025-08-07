@@ -1,6 +1,6 @@
 from django.db import models
 from users.models import User
-from doctores.models import DoctorPerfil
+from doctores.models import DoctorPerfil, Consultorio
 from pacientes.models import PacientePerfil
 
 class Cita(models.Model):
@@ -12,6 +12,7 @@ class Cita(models.Model):
     ]
     paciente = models.ForeignKey(PacientePerfil, on_delete=models.CASCADE, related_name='citas')
     doctor = models.ForeignKey(DoctorPerfil, on_delete=models.CASCADE, related_name='citas')
+    consultorio = models.ForeignKey(Consultorio, on_delete=models.CASCADE, related_name='citas', null=True, blank=True)
     fecha = models.DateField()
     hora_inicio = models.TimeField()
     hora_fin = models.TimeField()
@@ -22,8 +23,9 @@ class Cita(models.Model):
     creada_en = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('doctor', 'fecha', 'hora_inicio', 'hora_fin')
+        unique_together = ('doctor', 'consultorio', 'fecha', 'hora_inicio', 'hora_fin')
         ordering = ['-fecha', 'hora_inicio']
 
     def __str__(self):
-        return f"Cita de {self.paciente} con {self.doctor} el {self.fecha} a las {self.hora_inicio}"
+        consultorio_info = f" en {self.consultorio}" if self.consultorio else ""
+        return f"Cita de {self.paciente} con {self.doctor}{consultorio_info} el {self.fecha} a las {self.hora_inicio}"
