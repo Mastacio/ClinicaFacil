@@ -6,20 +6,30 @@
     <div class="card shadow-sm">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h2 class="fw-bold mb-0">Calendario de Citas del Doctor</h2>
-            <form method="get" class="d-flex align-items-center gap-2">
-                <label for="doctor" class="form-label mb-0">Doctor:</label>
-               <select name="doctor" id="doctor" class="form-select" onchange="this.form.submit()">
-                {% for doc in doctores %}
-                    <option value="{{ doc.id }}" {% if doc.id == doctor.id %}selected{% endif %}>{{ doc }}</option>
-                {% endfor %}
-                </select>
-
-
+            <form method="get" class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <label for="doctor" class="form-label mb-0 text-white fw-semibold">
+                        <i class="fas fa-user-md me-1"></i>Doctor:
+                    </label>
+                    <select name="doctor" id="doctor" class="form-select" style="min-width: 250px;">
+                        {% for doc in doctores %}
+                            <option value="{{ doc.id }}" {% if doc.id == doctor.id %}selected{% endif %}>
+                                {{ doc.user.get_full_name }} - {{ doc.especialidades.all|join:", " }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-light btn-sm">
+                    <i class="fas fa-search me-1"></i>Actualizar
+                </button>
             </form>
         </div>
 
         <div class="card-body">
             <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+            <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+            <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+            
             <div id="doctor-calendar"></div>
             <div id="intervalos-dia" style="display:none; margin-top:2rem;"></div>
 
@@ -60,8 +70,49 @@
 
             <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
             
             <style>
+            /* Estilos para Select2 */
+            .select2-container--bootstrap-5 .select2-selection {
+                border: 1px solid #dee2e6;
+                border-radius: 0.375rem;
+                min-height: 38px;
+            }
+            
+            .select2-container--bootstrap-5 .select2-selection--single {
+                background-color: #fff;
+                border: 1px solid #dee2e6;
+            }
+            
+            .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+                color: #212529;
+                line-height: 36px;
+                padding-left: 12px;
+                padding-right: 20px;
+            }
+            
+            .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+                height: 36px;
+                right: 6px;
+            }
+            
+            .select2-container--bootstrap-5 .select2-dropdown {
+                border-color: #dee2e6;
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            }
+            
+            .select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
+                background-color: #0d6efd;
+                color: white;
+            }
+            
+            .select2-container--bootstrap-5 .select2-search__field {
+                border: 1px solid #dee2e6;
+                border-radius: 0.375rem;
+                padding: 0.375rem 0.75rem;
+            }
+            
             /* Asegurar que el modal tenga prioridad sobre el menú */
             #crearCitaModal {
                 z-index: 10000 !important;
@@ -135,6 +186,31 @@
                 opacity: 0.9 !important;
                 font-weight: 600 !important;
             }
+            
+            /* Mejorar la apariencia del header del calendario */
+            .card-header {
+                background: linear-gradient(135deg, #0d6efd, #0b5ed7) !important;
+            }
+            
+            /* Estilos para el formulario de filtro */
+            .form-label {
+                font-size: 0.9rem;
+                font-weight: 600;
+            }
+            
+            .btn-light {
+                background: rgba(255, 255, 255, 0.9);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                color: #0d6efd;
+                font-weight: 600;
+                transition: all 0.3s ease;
+            }
+            
+            .btn-light:hover {
+                background: rgba(255, 255, 255, 1);
+                transform: translateY(-1px);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
             </style>
             <script>
                 const intervalos_por_dia = JSON.parse(document.getElementById('intervalos-por-dia-data').textContent);
@@ -187,6 +263,27 @@
                 let isModalLoading = false;
 
                 document.addEventListener('DOMContentLoaded', function () {
+                    // Inicializar Select2 para el select del doctor
+                    $('#doctor').select2({
+                        theme: 'bootstrap-5',
+                        placeholder: 'Selecciona un doctor...',
+                        allowClear: true,
+                        width: '250px',
+                        language: {
+                            noResults: function() {
+                                return "No se encontraron doctores";
+                            },
+                            searching: function() {
+                                return "Buscando...";
+                            }
+                        }
+                    });
+                    
+                    // Auto-submit cuando se selecciona un doctor
+                    $('#doctor').on('change', function() {
+                        $(this).closest('form').submit();
+                    });
+
                     // Inicializar el modal una sola vez
                     crearCitaModal = new bootstrap.Modal(document.getElementById('crearCitaModal'), {
                         backdrop: false, // Desactivar backdrop de Bootstrap

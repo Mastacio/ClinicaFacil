@@ -40,12 +40,12 @@ def api_buscar_doctores(request):
 
 @doctor_required
 def calendario_doctor(request):
-    # Obtener todos los doctores activos
-    doctores = DoctorPerfil.objects.filter(activo=True)
+    # Obtener todos los doctores activos con sus especialidades
+    doctores = DoctorPerfil.objects.filter(activo=True).select_related('user').prefetch_related('especialidades')
     doctor_id = request.GET.get('doctor')
     doctor = None
     if doctor_id:
-        doctor = DoctorPerfil.objects.filter(id=doctor_id).first()
+        doctor = DoctorPerfil.objects.filter(id=doctor_id, activo=True).select_related('user').prefetch_related('especialidades').first()
     if not doctor and doctores.exists():
         doctor = doctores.first()
     
@@ -83,7 +83,7 @@ def calendario_doctor(request):
             doctor=doctor, 
             fecha__gte=inicio_mes,
             fecha__lte=fin_mes,
-        ).exclude(estado='cancelada').select_related('paciente')
+        ).exclude(estado='cancelada').select_related('paciente__user', 'consultorio')
         
         for cita in citas:
             fecha_str = cita.fecha.strftime('%Y-%m-%d')
