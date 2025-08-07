@@ -32,18 +32,31 @@
 - Horarios de trabajo configurables
 - Calendario personal de citas
 
+### 🏢 Gestión de Consultorios (NUEVO)
+- **Sistema completo de consultorios** con información detallada
+- **Gestión CRUD** completa (Crear, Leer, Actualizar, Desactivar)
+- **Información de ubicación** y capacidad de pacientes
+- **Validación de horarios** para evitar conflictos de programación
+- **Vista detallada** con doctores y horarios asociados
+- **Filtros avanzados** por nombre y ubicación
+- **Integración automática** con el sistema de citas
+
 ### 👤 Gestión de Pacientes
 - Registro completo de pacientes
 - Perfiles detallados tipo CV
 - Historial médico integrado
 - Información de contacto y emergencia
 
-### 📅 Sistema de Citas
+### 📅 Sistema de Citas Mejorado
 - **Calendario interactivo** con FullCalendar.js
-- **Gestión de horarios** por doctor
+- **Gestión de horarios** por doctor y consultorio
 - **Estados de citas**: Pendiente, Confirmada, Completada, Cancelada
 - **Filtros avanzados** por fecha, estado, paciente y doctor
 - **Modal de creación** con cálculo automático de duración
+- **Asignación automática de consultorios** basada en horarios del doctor
+- **Validación de conflictos** de horarios en consultorios
+- **API endpoints** para carga dinámica de consultorios y horarios
+- **Select2 mejorado** con búsqueda avanzada en calendario
 
 ### 📋 Módulo de Gestión Médica
 - **Gestión de consultas** con diagnóstico y observaciones
@@ -79,6 +92,68 @@
 - **Filtros dinámicos** en agenda médica
 - **Vista de agenda** personalizada por doctor
 - **Gestión de estados** con confirmaciones
+
+## 🆕 Nuevas Funcionalidades (v2.0)
+
+### 🏢 Sistema de Consultorios
+El sistema ahora incluye una gestión completa de consultorios médicos:
+
+#### Características Principales:
+- **Gestión CRUD completa** de consultorios
+- **Información detallada**: nombre, descripción, ubicación, capacidad
+- **Estado activo/inactivo** para control de disponibilidad
+- **Validación de horarios** para evitar conflictos de programación
+- **Integración automática** con el sistema de citas
+
+#### Funcionalidades Avanzadas:
+- **Asignación automática** de consultorios en citas
+- **Validación de conflictos** de horarios por consultorio
+- **Vista detallada** con doctores y horarios asociados
+- **Filtros avanzados** por nombre y ubicación
+- **API endpoints** para carga dinámica de datos
+
+#### Comando de Gestión:
+```bash
+# Poblar consultorios de ejemplo
+python manage.py poblar_consultorios
+```
+
+### 📅 Sistema de Citas Mejorado
+
+#### Nuevas Características:
+- **Asignación automática de consultorios** basada en horarios del doctor
+- **Validación de conflictos** de horarios en consultorios
+- **API endpoints** para carga dinámica de datos
+- **Select2 mejorado** con búsqueda avanzada en calendario
+- **Integración completa** con el sistema de consultorios
+
+#### API Endpoints Nuevos:
+- **`/citas/api/cargar-consultorio/`** - Carga automática de consultorio
+- **`/citas/api/horarios-disponibles/`** - Horarios disponibles por doctor
+
+#### Mejoras en el Calendario:
+- **Select2 con búsqueda** para selección de doctores
+- **Información de especialidades** en las opciones
+- **Auto-submit** al cambiar de doctor
+- **Interfaz mejorada** con gradientes y efectos hover
+
+### 🔧 Mejoras Técnicas
+
+#### Validaciones Avanzadas:
+- **Validación de horarios** para evitar conflictos en consultorios
+- **Asignación automática** de consultorios en citas
+- **Validación de capacidad** de consultorios
+
+#### Optimizaciones de Base de Datos:
+- **Consultas optimizadas** con `select_related` y `prefetch_related`
+- **Índices mejorados** para búsquedas rápidas
+- **Relaciones optimizadas** entre modelos
+
+#### Interfaz de Usuario:
+- **Select2 personalizado** con tema Bootstrap 5
+- **Búsqueda en tiempo real** para doctores
+- **Mensajes en español** para mejor UX
+- **Responsive design** mejorado
 
 ## 🚀 Tecnologías Utilizadas
 
@@ -158,6 +233,9 @@ python manage.py poblar_medicamentos
 
 # Poblar análisis médicos
 python manage.py poblar_analisis
+
+# Poblar consultorios (NUEVO)
+python manage.py poblar_consultorios
 ```
 
 8. **Ejecutar el servidor**
@@ -182,19 +260,21 @@ ClínicaFácil/
 │   ├── views.py             # Vistas de autenticación
 │   └── templates/           # Templates de usuarios
 ├── doctores/                # Gestión de doctores
-│   ├── models.py            # Modelo DoctorPerfil
-│   ├── views.py             # Vistas de doctores
+│   ├── models.py            # Modelo DoctorPerfil y Consultorio
+│   ├── views.py             # Vistas de doctores y consultorios
 │   ├── management/          # Comandos de gestión de datos
 │   │   └── commands/        # Comandos personalizados
-│   │       └── poblar_especialidades.py
-│   └── templates/           # Templates de doctores
+│   │       ├── poblar_especialidades.py
+│   │       └── poblar_consultorios.py
+│   └── templates/           # Templates de doctores y consultorios
 ├── pacientes/               # Gestión de pacientes
 │   ├── models.py            # Modelo PacientePerfil
 │   ├── views.py             # Vistas de pacientes
 │   └── templates/           # Templates de pacientes
 ├── citas/                   # Sistema de citas
-│   ├── models.py            # Modelo Cita y HorarioDoctor
+│   ├── models.py            # Modelo Cita con consultorio
 │   ├── views.py             # Vistas de citas y agenda
+│   ├── forms.py             # Formularios con consultorio
 │   └── templates/           # Templates de citas
 ├── gestion/                 # Módulo de gestión médica
 │   ├── models.py            # Modelos de gestión y medicamentos
@@ -228,6 +308,16 @@ ClínicaFácil/
 - **Gestión de horarios** por día de la semana
 - **Perfiles médicos** con licencias y experiencia
 - **Filtros y búsqueda** avanzada
+- **Gestión de consultorios** (NUEVO)
+- **Validación de conflictos** de horarios
+
+### 🏢 Consultorios (`doctores/`)
+- **Gestión CRUD completa** de consultorios
+- **Información detallada**: nombre, descripción, ubicación, capacidad
+- **Estado activo/inactivo** para control de disponibilidad
+- **Vista detallada** con doctores y horarios asociados
+- **Filtros avanzados** por nombre y ubicación
+- **Validación de horarios** para evitar conflictos
 
 ### 👤 Pacientes (`pacientes/`)
 - **Registro de pacientes** con datos completos
@@ -238,9 +328,12 @@ ClínicaFácil/
 ### 📅 Citas (`citas/`)
 - **Calendario interactivo** con FullCalendar.js
 - **Creación de citas** con modal dinámico
-- **Gestión de horarios** por doctor
+- **Gestión de horarios** por doctor y consultorio
 - **Agenda médica** con filtros avanzados
 - **Estados de citas** (pendiente, confirmada, completada, cancelada)
+- **Asignación automática** de consultorios (NUEVO)
+- **API endpoints** para carga dinámica (NUEVO)
+- **Select2 mejorado** con búsqueda avanzada (NUEVO)
 
 ### 📋 Gestión (`gestion/`)
 - **Gestión de consultas** médicas
@@ -257,6 +350,12 @@ ClínicaFácil/
 3. Crear una configuración activa
 4. Subir archivos de timbrado, firma y sello
 5. Configurar información de la clínica
+
+### Configuración de Consultorios
+1. Acceder a "Consultorios" en el menú lateral
+2. Crear consultorios con información detallada
+3. Asignar horarios a doctores con consultorios específicos
+4. Configurar capacidad y ubicación de cada consultorio
 
 ### Personalización de Estilos
 - Los estilos están en `static/css/`
@@ -289,6 +388,13 @@ ClínicaFácil/
 - **Datos reales** y médicamente precisos
 - **Categorización completa** por especialidades y tipos
 - **Información detallada** con descripciones y preparaciones
+
+### 🏢 Sistema de Consultorios
+- **Modelo Consultorio** con campos completos
+- **Validación de horarios** para evitar conflictos
+- **Integración automática** con sistema de citas
+- **API endpoints** para carga dinámica de datos
+- **Comando de gestión** para poblar consultorios
 
 ## 🚀 Despliegue en Producción
 
@@ -336,6 +442,20 @@ python manage.py poblar_especialidades
 - Especialidades diagnósticas (Radiología, Patología)
 - Especialidades modernas (Medicina del Deporte, Medicina Integrativa)
 
+#### 🏢 Poblar Consultorios (NUEVO)
+```bash
+python manage.py poblar_consultorios
+```
+**Incluye consultorios de ejemplo:**
+- Consultorio General
+- Consultorio de Cardiología
+- Consultorio de Pediatría
+- Consultorio de Ginecología
+- Consultorio de Traumatología
+- Consultorio de Dermatología
+- Consultorio de Oftalmología
+- Consultorio de Odontología
+
 #### 💊 Poblar Medicamentos
 ```bash
 python manage.py poblar_medicamentos
@@ -381,6 +501,9 @@ python manage.py poblar_especialidades
 python manage.py poblar_medicamentos
 python manage.py poblar_analisis
 
+# Poblar consultorios (NUEVO)
+python manage.py poblar_consultorios
+
 # Crear migraciones
 python manage.py makemigrations
 
@@ -400,6 +523,42 @@ python manage.py test
 python manage.py shell
 ```
 
+## 🔄 Migración de Versiones
+
+### Actualización a v2.0
+Si ya tienes una instalación anterior de ClínicaFácil, sigue estos pasos para actualizar:
+
+1. **Hacer backup de la base de datos**
+```bash
+python manage.py dumpdata > backup.json
+```
+
+2. **Actualizar el código**
+```bash
+git pull origin main
+```
+
+3. **Instalar nuevas dependencias**
+```bash
+pip install -r requirements.txt
+```
+
+4. **Aplicar migraciones**
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+5. **Poblar nuevos datos**
+```bash
+python manage.py poblar_consultorios
+```
+
+6. **Verificar la instalación**
+```bash
+python manage.py runserver
+```
+
 ## 📄 Licencia
 
 Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
@@ -409,7 +568,7 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 **ClínicaFácil** - Sistema de Gestión Médica
 
 - **Desarrollado con**: Django, Bootstrap, JavaScript
-- **Versión**: 1.0.0
+- **Versión**: 2.0.0
 - **Fecha**: 2025
 
 ## 🙏 Agradecimientos
@@ -418,7 +577,15 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 - **Bootstrap** por los componentes responsive
 - **Font Awesome** por los iconos profesionales
 - **FullCalendar.js** por el calendario interactivo
+- **Select2** por los campos de búsqueda avanzada
 
 ---
 
-**ClínicaFácil** - Transformando la gestión médica con tecnología moderna y profesional. 🏥✨ 
+**ClínicaFácil v2.0** - Transformando la gestión médica con tecnología moderna y profesional. 🏥✨ 
+
+**Nuevas características en v2.0:**
+- 🏢 Sistema completo de consultorios
+- 📅 Asignación automática de consultorios en citas
+- 🔍 Búsqueda avanzada con Select2
+- ⚡ API endpoints para carga dinámica
+- 🛡️ Validaciones mejoradas de horarios 
